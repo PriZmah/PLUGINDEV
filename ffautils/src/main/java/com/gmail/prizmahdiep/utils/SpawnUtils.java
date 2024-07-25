@@ -59,8 +59,7 @@ public class SpawnUtils
     public int reloadSpawns() 
     {
         int loaded_spawns = 0;
-        spawns.clear();
-        spawns.putAll(spawn_cfg.getSpawnObjects());
+        spawns = spawn_cfg.getSpawnObjects();
         
         loaded_spawns = spawns.size();
         plugin.getLogger().info(loaded_spawns + " spawns loaded");

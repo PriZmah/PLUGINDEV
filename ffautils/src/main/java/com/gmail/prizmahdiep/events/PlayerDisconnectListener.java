@@ -4,7 +4,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
+import com.gmail.prizmahdiep.FFAUtils;
 import com.gmail.prizmahdiep.handlers.FFAPlayersHandler;
 import com.gmail.prizmahdiep.objects.FFAPlayer;
 import com.gmail.prizmahdiep.objects.SpawnLocation;
@@ -14,18 +16,27 @@ public class PlayerDisconnectListener implements Listener
 {
     private FFAPlayersHandler fph;
     private SpawnUtils sup;
+    private FFAUtils futils;
 
-    public PlayerDisconnectListener(FFAPlayersHandler fph, SpawnUtils sup)
+    public PlayerDisconnectListener(FFAPlayersHandler fph, SpawnUtils sup, FFAUtils futils)
     {
         this.fph = fph;
         this.sup = sup;
+        this.futils = futils;
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e)
     {
         Player p = e.getPlayer();
-        unloadFromFFA(p);
+        
+        new BukkitRunnable() {
+            @Override
+            public void run() 
+            {
+                unloadFromFFA(p);
+            }
+        }.runTaskLater(futils, 1);
     }
 
     public void unloadFromFFA(Player p)

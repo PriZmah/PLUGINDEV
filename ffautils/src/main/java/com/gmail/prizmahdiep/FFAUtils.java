@@ -51,7 +51,7 @@ public class FFAUtils extends JavaPlugin
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(su, fph), this);
         getServer().getPluginManager().registerEvents(new FFAPlayerLoadListener(ku, su), this);
         getServer().getPluginManager().registerEvents(new FFAPlayerUnloadListener(/*ku,*/ su), this);
-        getServer().getPluginManager().registerEvents(new PlayerDisconnectListener(fph, su), this);
-        getServer().getPluginManager().registerEvents(new PlayerRespawnListener(fph, su), this);
+        getServer().getPluginManager().registerEvents(new PlayerDisconnectListener(fph, su, this), this);
+        getServer().getPluginManager().registerEvents(new PlayerRespawnListener(fph, su, this), this);
     }
 }

@@ -4,7 +4,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
+import com.gmail.prizmahdiep.FFAUtils;
 import com.gmail.prizmahdiep.handlers.FFAPlayersHandler;
 import com.gmail.prizmahdiep.objects.FFAPlayer;
 import com.gmail.prizmahdiep.objects.SpawnLocation;
@@ -14,17 +16,27 @@ public class PlayerRespawnListener implements Listener
 {
     private FFAPlayersHandler fph;
     private SpawnUtils su;
+    private FFAUtils futils;
 
-    public PlayerRespawnListener(FFAPlayersHandler fph, SpawnUtils su) 
+    public PlayerRespawnListener(FFAPlayersHandler fph, SpawnUtils su, FFAUtils pl) 
     {
         this.fph = fph;
         this.su = su;
+        this.futils = pl;
     }
 
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent ev)
-    {
-        unloadPlayer(ev.getPlayer());
+    {   
+        Player p = ev.getPlayer();
+
+        new BukkitRunnable() {
+            @Override
+            public void run() 
+            {
+                unloadPlayer(p);
+            }
+        }.runTaskLater(futils, 1);
     }
 
     private void unloadPlayer(Player p) 
