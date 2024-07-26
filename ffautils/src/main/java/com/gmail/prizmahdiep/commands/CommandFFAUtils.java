@@ -11,11 +11,11 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 
 import com.gmail.prizmahdiep.handlers.FFAPlayersHandler;
+import com.gmail.prizmahdiep.handlers.KitHandler;
+import com.gmail.prizmahdiep.handlers.SpawnHandler;
 import com.gmail.prizmahdiep.objects.FFAPlayer;
 import com.gmail.prizmahdiep.objects.PlayerKit;
 import com.gmail.prizmahdiep.objects.SpawnLocation;
-import com.gmail.prizmahdiep.utils.KitUtils;
-import com.gmail.prizmahdiep.utils.SpawnUtils;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
@@ -31,11 +31,11 @@ import net.md_5.bungee.api.ChatColor;
 @CommandPermission("ffautils.admin")
 public class CommandFFAUtils extends BaseCommand
 {  
-    private SpawnUtils sp;
-    private KitUtils ku;
+    private SpawnHandler sp;
+    private KitHandler ku;
     private FFAPlayersHandler fph;
 
-    public CommandFFAUtils(SpawnUtils sp, KitUtils ku, FFAPlayersHandler fph) 
+    public CommandFFAUtils(SpawnHandler sp, KitHandler ku, FFAPlayersHandler fph) 
     {
         this.sp = sp;
         this.ku = ku;
@@ -62,7 +62,7 @@ public class CommandFFAUtils extends BaseCommand
         public void onListSpawns(CommandSender p)
         {
             p.sendMessage(ChatColor.AQUA + "Available spawns:");
-            SpawnUtils.spawns.forEach((spawn_name, spawn) ->
+            SpawnHandler.spawns.forEach((spawn_name, spawn) ->
                 {
                     ChatColor color_type;
                     String spawn_type = spawn.getType();
@@ -268,26 +268,26 @@ public class CommandFFAUtils extends BaseCommand
         @CommandCompletion("kit_name spawn_name")
         public void onLoadAllLoadedPlayers(CommandSender s, String kit, String spawn)
         {
-            if (!KitUtils.kits.containsKey(kit.toUpperCase()))
+            if (!KitHandler.kits.containsKey(kit.toUpperCase()))
             {
                 s.sendMessage(ChatColor.RED + "Kit " + kit + " does not exist");
                 return;
             }
             
-            if (!SpawnUtils.spawns.containsKey(spawn.toUpperCase()))
+            if (!SpawnHandler.spawns.containsKey(spawn.toUpperCase()))
             {
                 s.sendMessage(ChatColor.RED + "Spawn " + spawn + " does not exist");
                 return;
             }
             
-            if (SpawnUtils.spawns.get(spawn.toUpperCase()).getType().equals(SpawnLocation.SPAWN))
+            if (SpawnHandler.spawns.get(spawn.toUpperCase()).getType().equals(SpawnLocation.SPAWN))
             {
                 s.sendMessage(ChatColor.RED + "You can't load to the main spawn");
                 return;
             }
 
-            PlayerKit k = KitUtils.kits.get(kit.toUpperCase());
-            SpawnLocation spl = SpawnUtils.spawns.get(spawn.toUpperCase());
+            PlayerKit k = KitHandler.kits.get(kit.toUpperCase());
+            SpawnLocation spl = SpawnHandler.spawns.get(spawn.toUpperCase());
             FFAPlayersHandler.ffa_players.forEach(
                 (uuid, ffaplayer) ->
                 {
@@ -303,26 +303,26 @@ public class CommandFFAUtils extends BaseCommand
         @CommandCompletion("kit_name spawn_name")
         public void onLoadAllUnloadedPlayers(CommandSender s, String kit, String spawn)
         {
-            if (!KitUtils.kits.containsKey(kit.toUpperCase()))
+            if (!KitHandler.kits.containsKey(kit.toUpperCase()))
             {
                 s.sendMessage(ChatColor.RED + "Kit " + kit + " does not exist");
                 return;
             }
 
-            if (!SpawnUtils.spawns.containsKey(spawn.toUpperCase()))
+            if (!SpawnHandler.spawns.containsKey(spawn.toUpperCase()))
             {
                 s.sendMessage(ChatColor.RED + "Spawn " + spawn + " does not exist");
                 return;
             }
 
-            if (SpawnUtils.spawns.get(spawn.toUpperCase()).getType().equals(SpawnLocation.SPAWN))
+            if (SpawnHandler.spawns.get(spawn.toUpperCase()).getType().equals(SpawnLocation.SPAWN))
             {
                 s.sendMessage(ChatColor.RED + "You can't load to the main spawn");
                 return;
             }
 
-            PlayerKit k = KitUtils.kits.get(kit.toUpperCase());
-            SpawnLocation spl = SpawnUtils.spawns.get(spawn.toUpperCase());
+            PlayerKit k = KitHandler.kits.get(kit.toUpperCase());
+            SpawnLocation spl = SpawnHandler.spawns.get(spawn.toUpperCase());
 
             Bukkit.getOnlinePlayers().forEach(
                 (p) ->  fph.addPlayerToFFA(p, k, spl)
@@ -333,26 +333,26 @@ public class CommandFFAUtils extends BaseCommand
         @CommandCompletion("kit_name spawn_name")
         public void onLoadAllPlayers(CommandSender s, String kit, String spawn)
         {
-            if (!KitUtils.kits.containsKey(kit.toUpperCase()))
+            if (!KitHandler.kits.containsKey(kit.toUpperCase()))
             {
                 s.sendMessage(ChatColor.RED + "Kit " + kit + " does not exist");
                 return;
             }
 
-            if (!SpawnUtils.spawns.containsKey(spawn.toUpperCase()))
+            if (!SpawnHandler.spawns.containsKey(spawn.toUpperCase()))
             {
                 s.sendMessage(ChatColor.RED + "Spawn " + spawn + " does not exist");
                 return;
             }
 
-            if (SpawnUtils.spawns.get(spawn.toUpperCase()).getType().equals(SpawnLocation.SPAWN))
+            if (SpawnHandler.spawns.get(spawn.toUpperCase()).getType().equals(SpawnLocation.SPAWN))
             {
                 s.sendMessage(ChatColor.RED + "You can't load to the main spawn");
                 return;
             }
 
-            PlayerKit k = KitUtils.kits.get(kit.toUpperCase());
-            SpawnLocation spl = SpawnUtils.spawns.get(spawn.toUpperCase());
+            PlayerKit k = KitHandler.kits.get(kit.toUpperCase());
+            SpawnLocation spl = SpawnHandler.spawns.get(spawn.toUpperCase());
             
             Bukkit.getOnlinePlayers().forEach(
                 (p) ->  

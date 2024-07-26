@@ -6,14 +6,14 @@ import org.bukkit.event.Listener;
 
 import com.gmail.prizmahdiep.events.custom.FFAPlayerUnloadEvent;
 import com.gmail.prizmahdiep.handlers.FFAPlayersHandler;
+import com.gmail.prizmahdiep.handlers.SpawnHandler;
 import com.gmail.prizmahdiep.objects.FFAPlayer;
-import com.gmail.prizmahdiep.utils.SpawnUtils;
 
 public class FFAPlayerUnloadListener implements Listener
 {
-    private SpawnUtils su;
+    private SpawnHandler su;
 
-    public FFAPlayerUnloadListener(SpawnUtils su)
+    public FFAPlayerUnloadListener(SpawnHandler su)
     {
         this.su = su;
     }

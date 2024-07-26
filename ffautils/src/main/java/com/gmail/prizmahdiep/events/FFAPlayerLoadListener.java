@@ -5,16 +5,16 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 import com.gmail.prizmahdiep.events.custom.FFAPlayerLoadEvent;
+import com.gmail.prizmahdiep.handlers.KitHandler;
+import com.gmail.prizmahdiep.handlers.SpawnHandler;
 import com.gmail.prizmahdiep.objects.FFAPlayer;
-import com.gmail.prizmahdiep.utils.KitUtils;
-import com.gmail.prizmahdiep.utils.SpawnUtils;
 
 public class FFAPlayerLoadListener implements Listener
 {
-    private KitUtils ku;
-    private SpawnUtils su;
+    private KitHandler ku;
+    private SpawnHandler su;
 
-    public FFAPlayerLoadListener(KitUtils ku, SpawnUtils su)
+    public FFAPlayerLoadListener(KitHandler ku, SpawnHandler su)
     {
         this.su = su;
         this.ku = ku;

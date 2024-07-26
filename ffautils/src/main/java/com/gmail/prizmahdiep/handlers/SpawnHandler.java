@@ -1,4 +1,4 @@
-package com.gmail.prizmahdiep.utils;
+package com.gmail.prizmahdiep.handlers;
 
 import java.util.Map;
 import java.util.Set;
@@ -8,16 +8,16 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 
 import com.gmail.prizmahdiep.FFAUtils;
-import com.gmail.prizmahdiep.config.SpawnsConfig;
+import com.gmail.prizmahdiep.config.SpawnConfig;
 import com.gmail.prizmahdiep.objects.SpawnLocation;
 
-public class SpawnUtils
+public class SpawnHandler
 {
     public static Map<String, SpawnLocation> spawns;
     private FFAUtils plugin;
-    private SpawnsConfig spawn_cfg;
+    private SpawnConfig spawn_cfg;
     
-    public SpawnUtils(FFAUtils pl, SpawnsConfig scfg)
+    public SpawnHandler(FFAUtils pl, SpawnConfig scfg)
     {
         this.plugin = pl;
         this.spawn_cfg = scfg;

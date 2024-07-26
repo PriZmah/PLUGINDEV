@@ -1,4 +1,4 @@
-package com.gmail.prizmahdiep.utils;
+package com.gmail.prizmahdiep.handlers;
 
 import java.util.Map;
 import java.util.Set;
@@ -10,16 +10,16 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
 import com.gmail.prizmahdiep.FFAUtils;
-import com.gmail.prizmahdiep.config.KitsConfig;
+import com.gmail.prizmahdiep.config.KitConfig;
 import com.gmail.prizmahdiep.objects.PlayerKit;
 
-public class KitUtils 
+public class KitHandler 
 {
     public static Map<String, PlayerKit> kits;
     private FFAUtils plugin;
-    private KitsConfig kitsconf;
+    private KitConfig kitsconf;
 
-    public KitUtils(FFAUtils pl, KitsConfig kcfg) 
+    public KitHandler(FFAUtils pl, KitConfig kcfg) 
     {
         this.plugin = pl;
         this.kitsconf = kcfg;

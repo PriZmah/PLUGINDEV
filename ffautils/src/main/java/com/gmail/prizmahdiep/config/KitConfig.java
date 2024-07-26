@@ -28,14 +28,14 @@ import com.gmail.prizmahdiep.FFAUtils;
 import com.gmail.prizmahdiep.objects.PlayerKit;
 
 
-public class KitsConfig 
+public class KitConfig 
 {
     private final String config_filename = "kits.yml";
     private FFAUtils pl;
     private File kits_configuration_file;
     private FileConfiguration kits_configuration;
 
-    public KitsConfig(FFAUtils ffa_utils) 
+    public KitConfig(FFAUtils ffa_utils) 
     {
         this.pl = ffa_utils;
     }

@@ -6,14 +6,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 import com.gmail.prizmahdiep.handlers.FFAPlayersHandler;
-import com.gmail.prizmahdiep.utils.SpawnUtils;
+import com.gmail.prizmahdiep.handlers.SpawnHandler;
 
 public class PlayerJoinListener implements Listener 
 {
-    private SpawnUtils sup;
+    private SpawnHandler sup;
     private FFAPlayersHandler fph;
 
-    public PlayerJoinListener(SpawnUtils sup, FFAPlayersHandler fph)
+    public PlayerJoinListener(SpawnHandler sup, FFAPlayersHandler fph)
     {
         this.sup = sup;
         this.fph = fph;

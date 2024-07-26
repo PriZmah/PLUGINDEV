@@ -14,14 +14,14 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import com.gmail.prizmahdiep.FFAUtils;
 import com.gmail.prizmahdiep.objects.SpawnLocation;
 
-public class SpawnsConfig 
+public class SpawnConfig 
 {
     private final String config_filename = "spawns.yml";
     private FFAUtils plugin;
     private File spawns_configuration_file;
     private FileConfiguration spawns_configuration;
 
-    public SpawnsConfig(FFAUtils pl)
+    public SpawnConfig(FFAUtils pl)
     {
         this.plugin = pl;
     }

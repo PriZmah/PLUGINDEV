@@ -8,17 +8,17 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.gmail.prizmahdiep.FFAUtils;
 import com.gmail.prizmahdiep.handlers.FFAPlayersHandler;
+import com.gmail.prizmahdiep.handlers.SpawnHandler;
 import com.gmail.prizmahdiep.objects.FFAPlayer;
 import com.gmail.prizmahdiep.objects.SpawnLocation;
-import com.gmail.prizmahdiep.utils.SpawnUtils;
 
 public class PlayerRespawnListener implements Listener
 {
     private FFAPlayersHandler fph;
-    private SpawnUtils su;
+    private SpawnHandler su;
     private FFAUtils futils;
 
-    public PlayerRespawnListener(FFAPlayersHandler fph, SpawnUtils su, FFAUtils pl) 
+    public PlayerRespawnListener(FFAPlayersHandler fph, SpawnHandler su, FFAUtils pl) 
     {
         this.fph = fph;
         this.su = su;

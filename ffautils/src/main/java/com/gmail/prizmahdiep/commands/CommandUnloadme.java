@@ -4,9 +4,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import com.gmail.prizmahdiep.handlers.FFAPlayersHandler;
+import com.gmail.prizmahdiep.handlers.SpawnHandler;
 import com.gmail.prizmahdiep.objects.FFAPlayer;
 import com.gmail.prizmahdiep.objects.SpawnLocation;
-import com.gmail.prizmahdiep.utils.SpawnUtils;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
@@ -19,9 +19,9 @@ import net.md_5.bungee.api.ChatColor;
 public class CommandUnloadme extends BaseCommand
 {
     private FFAPlayersHandler fph;
-    private SpawnUtils sputils;
+    private SpawnHandler sputils;
 
-    public CommandUnloadme(FFAPlayersHandler fph, SpawnUtils sputils)
+    public CommandUnloadme(FFAPlayersHandler fph, SpawnHandler sputils)
     {
         this.fph = fph;
         this.sputils = sputils;

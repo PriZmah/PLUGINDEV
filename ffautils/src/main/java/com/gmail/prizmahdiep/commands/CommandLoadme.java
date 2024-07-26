@@ -4,11 +4,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import com.gmail.prizmahdiep.handlers.FFAPlayersHandler;
+import com.gmail.prizmahdiep.handlers.KitHandler;
+import com.gmail.prizmahdiep.handlers.SpawnHandler;
 import com.gmail.prizmahdiep.objects.FFAPlayer;
 import com.gmail.prizmahdiep.objects.PlayerKit;
 import com.gmail.prizmahdiep.objects.SpawnLocation;
-import com.gmail.prizmahdiep.utils.KitUtils;
-import com.gmail.prizmahdiep.utils.SpawnUtils;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
@@ -32,8 +32,8 @@ public class CommandLoadme extends BaseCommand
     @CommandCompletion("kit_name spawn_name")
     public void onLoadMe(Player p, String kit, String spawn)
     {
-        SpawnLocation sa = SpawnUtils.spawns.get(spawn.toUpperCase());
-        PlayerKit ka = KitUtils.kits.get(kit.toUpperCase());
+        SpawnLocation sa = SpawnHandler.spawns.get(spawn.toUpperCase());
+        PlayerKit ka = KitHandler.kits.get(kit.toUpperCase());
         FFAPlayer ffap = FFAPlayersHandler.ffa_players.get(p.getUniqueId());
 
         if (ffap != null)
