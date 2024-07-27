@@ -3,7 +3,7 @@ package com.gmail.prizmahdiep.objects;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
-import com.gmail.prizmahdiep.handlers.SpawnHandler;
+import com.gmail.prizmahdiep.managers.SpawnManager;
 
 public class SpawnLocation 
 {
@@ -23,7 +23,7 @@ public class SpawnLocation
         {
             if (type.equals(SPAWN))
             {
-                SpawnHandler.spawns.forEach((spawn_name, spawn) -> 
+                SpawnManager.spawns.forEach((spawn_name, spawn) -> 
                     {
                         if (spawn.getType().equals(SPAWN))
                         {

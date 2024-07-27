@@ -1,18 +1,20 @@
 package com.gmail.prizmahdiep;
 
+import java.sql.SQLException;
+
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.gmail.prizmahdiep.commands.CommandHandler;
-import com.gmail.prizmahdiep.config.KitConfig;
 import com.gmail.prizmahdiep.config.SpawnConfig;
-import com.gmail.prizmahdiep.events.FFAPlayerLoadListener;
-import com.gmail.prizmahdiep.events.FFAPlayerUnloadListener;
-import com.gmail.prizmahdiep.events.PlayerDisconnectListener;
-import com.gmail.prizmahdiep.events.PlayerJoinListener;
-import com.gmail.prizmahdiep.events.PlayerRespawnListener;
-import com.gmail.prizmahdiep.handlers.FFAPlayersHandler;
-import com.gmail.prizmahdiep.handlers.KitHandler;
-import com.gmail.prizmahdiep.handlers.SpawnHandler;
+import com.gmail.prizmahdiep.database.KitDatabase;
+import com.gmail.prizmahdiep.listeners.FFAPlayerLoadListener;
+import com.gmail.prizmahdiep.listeners.FFAPlayerUnloadListener;
+import com.gmail.prizmahdiep.listeners.PlayerDisconnectListener;
+import com.gmail.prizmahdiep.listeners.PlayerJoinListener;
+import com.gmail.prizmahdiep.listeners.PlayerRespawnListener;
+import com.gmail.prizmahdiep.managers.FFAPlayersManager;
+import com.gmail.prizmahdiep.managers.KitManager;
+import com.gmail.prizmahdiep.managers.SpawnManager;
 
 import co.aikar.commands.PaperCommandManager;
 
@@ -20,11 +22,11 @@ import co.aikar.commands.PaperCommandManager;
 public class FFAUtils extends JavaPlugin
 {
     private SpawnConfig spawn_config;
-    private KitConfig kit_config;
-    private FFAPlayersHandler ffa_players_handler;
-    private SpawnHandler spawn_handler;
-    private KitHandler kit_handler;
+    private FFAPlayersManager ffa_players_handler;
+    private SpawnManager spawn_handler;
+    private KitManager kit_handler;
     private CommandHandler command_handler;
+    private KitDatabase kit_database;
     
     @Override
     public void onEnable()
@@ -33,14 +35,13 @@ public class FFAUtils extends JavaPlugin
         if (!getDataFolder().exists()) getDataFolder().mkdir();
         
         spawn_config = new SpawnConfig(this);
-        kit_config = new KitConfig(this);
-        ffa_players_handler = new FFAPlayersHandler();
-        spawn_handler = new SpawnHandler(this, spawn_config);
-        kit_handler = new KitHandler(null, kit_config);
+        ffa_players_handler = new FFAPlayersManager();
+        spawn_handler = new SpawnManager(this, spawn_config);
+        kit_handler = new KitManager(null, kit_database);
         command_handler = new CommandHandler(new PaperCommandManager(this));
-    
         spawn_config.createSpawnConfiguration();
-        kit_config.createKitsConfiguration();
+        kit_database = new KitDatabase(getDataFolder().getAbsolutePath() + "/kits.db");
+    
 
         command_handler.registerCommands(spawn_handler, kit_handler, ffa_players_handler);
         registerFFAUtilsEvents();
@@ -49,6 +50,13 @@ public class FFAUtils extends JavaPlugin
     @Override
     public void onDisable()
     {
+        try 
+        {
+            kit_database.closeConnection();
+        } catch (SQLException e) 
+        {
+            e.printStackTrace();
+        }
         getLogger().info("Stopping FFAUtils");
     }
 

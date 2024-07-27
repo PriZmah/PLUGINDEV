@@ -3,8 +3,8 @@ package com.gmail.prizmahdiep.commands;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import com.gmail.prizmahdiep.handlers.FFAPlayersHandler;
-import com.gmail.prizmahdiep.handlers.SpawnHandler;
+import com.gmail.prizmahdiep.managers.FFAPlayersManager;
+import com.gmail.prizmahdiep.managers.SpawnManager;
 import com.gmail.prizmahdiep.objects.FFAPlayer;
 import com.gmail.prizmahdiep.objects.SpawnLocation;
 
@@ -18,10 +18,10 @@ import net.md_5.bungee.api.ChatColor;
 @CommandAlias("unloadme|unldme")
 public class CommandUnloadme extends BaseCommand
 {
-    private FFAPlayersHandler fph;
-    private SpawnHandler sputils;
+    private FFAPlayersManager fph;
+    private SpawnManager sputils;
 
-    public CommandUnloadme(FFAPlayersHandler fph, SpawnHandler sputils)
+    public CommandUnloadme(FFAPlayersManager fph, SpawnManager sputils)
     {
         this.fph = fph;
         this.sputils = sputils;
@@ -30,7 +30,7 @@ public class CommandUnloadme extends BaseCommand
     @Default
     public void onUnloadme(Player p)
     {
-        FFAPlayer ffap = FFAPlayersHandler.ffa_players.get(p.getUniqueId());
+        FFAPlayer ffap = FFAPlayersManager.ffa_players.get(p.getUniqueId());
         SpawnLocation main_spawn = sputils.getMainSpawn();
         
         if (ffap == null)

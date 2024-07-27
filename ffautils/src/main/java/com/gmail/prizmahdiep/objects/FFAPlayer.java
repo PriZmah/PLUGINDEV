@@ -51,7 +51,7 @@ public class FFAPlayer
         this.last_player_kit = this.player_kit;
         if (pk == null)
         {
-            PlayerKit empty = new PlayerKit("empty", new ItemStack[0], new ArrayList<>(0));
+            PlayerKit empty = new PlayerKit("empty", new ItemStack[0], new ArrayList<>(0), false);
             this.player_kit = empty;
         }
         else this.player_kit = pk;
@@ -61,5 +61,10 @@ public class FFAPlayer
     {
         this.last_chosen_spawn = this.chosen_spawn;
         this.chosen_spawn = s;
+    }
+
+    public void restorePlayerKit()
+    {
+
     }
 }

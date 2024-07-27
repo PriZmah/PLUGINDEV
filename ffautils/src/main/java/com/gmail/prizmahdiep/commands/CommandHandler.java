@@ -1,8 +1,8 @@
 package com.gmail.prizmahdiep.commands;
 
-import com.gmail.prizmahdiep.handlers.FFAPlayersHandler;
-import com.gmail.prizmahdiep.handlers.KitHandler;
-import com.gmail.prizmahdiep.handlers.SpawnHandler;
+import com.gmail.prizmahdiep.managers.FFAPlayersManager;
+import com.gmail.prizmahdiep.managers.KitManager;
+import com.gmail.prizmahdiep.managers.SpawnManager;
 
 import co.aikar.commands.PaperCommandManager;
 
@@ -15,7 +15,7 @@ public class CommandHandler
         this.manager = manager;
     }
 
-    public void registerCommands(SpawnHandler sp, KitHandler ku, FFAPlayersHandler fph)
+    public void registerCommands(SpawnManager sp, KitManager ku, FFAPlayersManager fph)
     {
         manager.registerCommand(new CommandFFAUtils(sp, ku, fph));
         manager.registerCommand(new CommandLoadme(fph));

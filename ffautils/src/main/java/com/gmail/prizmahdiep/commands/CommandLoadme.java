@@ -3,9 +3,9 @@ package com.gmail.prizmahdiep.commands;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import com.gmail.prizmahdiep.handlers.FFAPlayersHandler;
-import com.gmail.prizmahdiep.handlers.KitHandler;
-import com.gmail.prizmahdiep.handlers.SpawnHandler;
+import com.gmail.prizmahdiep.managers.FFAPlayersManager;
+import com.gmail.prizmahdiep.managers.KitManager;
+import com.gmail.prizmahdiep.managers.SpawnManager;
 import com.gmail.prizmahdiep.objects.FFAPlayer;
 import com.gmail.prizmahdiep.objects.PlayerKit;
 import com.gmail.prizmahdiep.objects.SpawnLocation;
@@ -21,9 +21,9 @@ import net.md_5.bungee.api.ChatColor;
 @CommandAlias("loadme|ldme")
 public class CommandLoadme extends BaseCommand
 {
-    private FFAPlayersHandler fph;
+    private FFAPlayersManager fph;
 
-    public CommandLoadme(FFAPlayersHandler fph)
+    public CommandLoadme(FFAPlayersManager fph)
     {
         this.fph = fph;
     }
@@ -32,9 +32,9 @@ public class CommandLoadme extends BaseCommand
     @CommandCompletion("kit_name spawn_name")
     public void onLoadMe(Player p, String kit, String spawn)
     {
-        SpawnLocation sa = SpawnHandler.spawns.get(spawn.toUpperCase());
-        PlayerKit ka = KitHandler.kits.get(kit.toUpperCase());
-        FFAPlayer ffap = FFAPlayersHandler.ffa_players.get(p.getUniqueId());
+        SpawnLocation sa = SpawnManager.spawns.get(spawn.toUpperCase());
+        PlayerKit ka = KitManager.kits.get(kit.toUpperCase());
+        FFAPlayer ffap = FFAPlayersManager.ffa_players.get(p.getUniqueId());
 
         if (ffap != null)
         {

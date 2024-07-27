@@ -9,13 +9,15 @@ public class PlayerKit
 { 
     private String name;
     private ItemStack[] inventory_contents;
+    private boolean restorable = false;
     private Collection<PotionEffect> effects;
 
-    public PlayerKit(String name, ItemStack[] inventory_contents, Collection<PotionEffect> effects)
+    public PlayerKit(String name, ItemStack[] inventory_contents, Collection<PotionEffect> effects, boolean restorable)
     {
         this.name = name;
         this.inventory_contents = inventory_contents;
         this.effects = effects;
+        this.restorable = restorable;
     }
 
     public String getName()
@@ -28,7 +30,7 @@ public class PlayerKit
         return this.inventory_contents;
     }
 
-    public Collection<PotionEffect> getEffects()
+    public Collection<PotionEffect> getPotionEffects()
     {
         return this.effects;
     }
@@ -46,5 +48,10 @@ public class PlayerKit
     public void setPotionEffects(Collection<PotionEffect> effects)
     {
         this.effects = effects;
+    }
+
+    public boolean isRestorable()
+    {
+        return restorable;
     }
 }
