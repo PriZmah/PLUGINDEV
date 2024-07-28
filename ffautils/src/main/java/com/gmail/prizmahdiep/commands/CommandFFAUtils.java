@@ -14,7 +14,7 @@ import com.gmail.prizmahdiep.managers.FFAPlayersManager;
 import com.gmail.prizmahdiep.managers.KitManager;
 import com.gmail.prizmahdiep.managers.SpawnManager;
 import com.gmail.prizmahdiep.objects.FFAPlayer;
-import com.gmail.prizmahdiep.objects.PlayerKit;
+import com.gmail.prizmahdiep.objects.KitInterface;
 import com.gmail.prizmahdiep.objects.SpawnLocation;
 
 import co.aikar.commands.BaseCommand;
@@ -76,8 +76,9 @@ public class CommandFFAUtils extends BaseCommand
         public void onListKits(CommandSender p)
         {
             p.sendMessage(ChatColor.AQUA + "Available kits:");
-            ku.getExistingKitNames().forEach(
-                    (kit) -> p.sendMessage(kit)
+            KitManager.kits.forEach((name, kit) ->
+                p.sendMessage(name + ChatColor.YELLOW + " - " + 
+                (kit.isRestorable() ? ChatColor.GRAY + "restorable" : ""))
             );
         }
 
@@ -284,7 +285,7 @@ public class CommandFFAUtils extends BaseCommand
                 return;
             }
 
-            PlayerKit k = KitManager.kits.get(kit.toUpperCase());
+            KitInterface k = KitManager.kits.get(kit.toUpperCase());
             SpawnLocation spl = SpawnManager.spawns.get(spawn.toUpperCase());
             FFAPlayersManager.ffa_players.forEach(
                 (uuid, ffaplayer) ->
@@ -319,7 +320,7 @@ public class CommandFFAUtils extends BaseCommand
                 return;
             }
 
-            PlayerKit k = KitManager.kits.get(kit.toUpperCase());
+            KitInterface k = KitManager.kits.get(kit.toUpperCase());
             SpawnLocation spl = SpawnManager.spawns.get(spawn.toUpperCase());
 
             Bukkit.getOnlinePlayers().forEach(
@@ -349,7 +350,7 @@ public class CommandFFAUtils extends BaseCommand
                 return;
             }
 
-            PlayerKit k = KitManager.kits.get(kit.toUpperCase());
+            KitInterface k = KitManager.kits.get(kit.toUpperCase());
             SpawnLocation spl = SpawnManager.spawns.get(spawn.toUpperCase());
             
             Bukkit.getOnlinePlayers().forEach(

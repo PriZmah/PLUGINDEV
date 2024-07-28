@@ -9,6 +9,8 @@ public class SpawnLocation
 {
     public static final String SPAWN = "spawn";
     public static final String STANDARD = "standard";
+    public static final String FTN = "ft#";
+    public static final String EDITOR_ROOM = "editor";
 
     private final String name;
     private final Location location;
@@ -34,9 +36,8 @@ public class SpawnLocation
                     }
                 );
             }
-            if (!type.equals(STANDARD) && !type.equals(SPAWN))
+            if (!type.equals(STANDARD) && !type.equals(SPAWN) && !type.equals(FTN) && !type.equals(EDITOR_ROOM))
             {
-                Bukkit.getServer().getLogger().warning("Spawn type not valid");
                 this.type = STANDARD;
             }
         }

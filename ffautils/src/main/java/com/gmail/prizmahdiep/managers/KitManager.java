@@ -1,7 +1,6 @@
 package com.gmail.prizmahdiep.managers;
 
 import java.util.Map;
-import java.util.Set;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -12,11 +11,12 @@ import org.bukkit.potion.PotionEffect;
 
 import com.gmail.prizmahdiep.FFAUtils;
 import com.gmail.prizmahdiep.database.KitDatabase;
-import com.gmail.prizmahdiep.objects.PlayerKit;
+import com.gmail.prizmahdiep.objects.Kit;
+import com.gmail.prizmahdiep.objects.KitInterface;
 
-public class KitManager 
+public class KitManager
 {
-    public static Map<String, PlayerKit> kits;
+    public static Map<String, KitInterface> kits;
     private FFAUtils plugin;
     private KitDatabase kit_database;
 
@@ -30,7 +30,7 @@ public class KitManager
 
     public boolean createKit(String name, ItemStack[] inv, Collection<PotionEffect> pf, boolean restorable)
     {
-        PlayerKit k = new PlayerKit(name, inv, pf, restorable);
+        Kit k = new Kit(name, inv, pf, restorable);
         try
         {
             if (!kit_database.kitExists(k.getName()) && !kits.containsKey(name))
@@ -67,9 +67,9 @@ public class KitManager
             plugin.getLogger().info("Kit " + k_name + " does not exists");
             return false;
         }
-        PlayerKit k = kits.get(k_name);
-
-        p.getInventory().setContents(k.getInventoryContents());
+        KitInterface k = kits.get(k_name);
+        
+        p.getInventory().setContents(k.getInventory());
         p.clearActivePotionEffects();
         p.addPotionEffects(k.getPotionEffects());
         
@@ -88,10 +88,5 @@ public class KitManager
             e.printStackTrace();
         }
         return kits.size();
-    }
-
-    public Set<String> getExistingKitNames()
-    {
-        return kits.keySet();
     }
 }

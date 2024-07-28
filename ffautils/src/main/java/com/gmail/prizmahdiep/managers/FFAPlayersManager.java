@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import com.gmail.prizmahdiep.events.FFAPlayerLoadEvent;
 import com.gmail.prizmahdiep.events.FFAPlayerUnloadEvent;
 import com.gmail.prizmahdiep.objects.FFAPlayer;
-import com.gmail.prizmahdiep.objects.PlayerKit;
+import com.gmail.prizmahdiep.objects.KitInterface;
 import com.gmail.prizmahdiep.objects.SpawnLocation;
 
 public class FFAPlayersManager 
@@ -27,7 +27,7 @@ public class FFAPlayersManager
         return ffa_players.containsKey(p);   
     }
 
-    public boolean addPlayerToFFA(Player p, PlayerKit k, SpawnLocation s)
+    public boolean addPlayerToFFA(Player p, KitInterface k, SpawnLocation s)
     {  
         UUID piud = p.getUniqueId();
         FFAPlayer pf = new FFAPlayer(p, k, s);

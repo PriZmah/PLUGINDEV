@@ -7,7 +7,7 @@ import com.gmail.prizmahdiep.managers.FFAPlayersManager;
 import com.gmail.prizmahdiep.managers.KitManager;
 import com.gmail.prizmahdiep.managers.SpawnManager;
 import com.gmail.prizmahdiep.objects.FFAPlayer;
-import com.gmail.prizmahdiep.objects.PlayerKit;
+import com.gmail.prizmahdiep.objects.KitInterface;
 import com.gmail.prizmahdiep.objects.SpawnLocation;
 
 import co.aikar.commands.BaseCommand;
@@ -33,7 +33,7 @@ public class CommandLoadme extends BaseCommand
     public void onLoadMe(Player p, String kit, String spawn)
     {
         SpawnLocation sa = SpawnManager.spawns.get(spawn.toUpperCase());
-        PlayerKit ka = KitManager.kits.get(kit.toUpperCase());
+        KitInterface ka = KitManager.kits.get(kit.toUpperCase());
         FFAPlayer ffap = FFAPlayersManager.ffa_players.get(p.getUniqueId());
 
         if (ffap != null)

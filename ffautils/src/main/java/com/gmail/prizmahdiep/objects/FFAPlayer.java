@@ -10,14 +10,13 @@ import java.util.UUID;
 public class FFAPlayer
 {
     private final UUID player_uuid;
-    private PlayerKit player_kit, last_player_kit;
+    private KitInterface player_kit, last_player_kit;
     private SpawnLocation chosen_spawn, last_chosen_spawn;
 
-    public FFAPlayer(Player p, PlayerKit pk, SpawnLocation spawn)
+    public FFAPlayer(Player p, KitInterface pk, SpawnLocation spawn)
     {
         this.player_uuid = p.getUniqueId();
         this.player_kit = pk;
-        this.last_player_kit = pk;
         this.chosen_spawn = spawn;
     }
 
@@ -26,12 +25,12 @@ public class FFAPlayer
         return Bukkit.getPlayer(player_uuid);
     }
 
-    public PlayerKit getPlayerKit()
+    public KitInterface getPlayerKit()
     {
         return this.player_kit;
     }
 
-    public PlayerKit getLastPlayerKit()
+    public KitInterface getLastPlayerKit()
     {
         return this.last_player_kit;
     }
@@ -46,12 +45,12 @@ public class FFAPlayer
         return this.last_chosen_spawn;
     }
 
-    public void setPlayerKit(PlayerKit pk)
+    public void setPlayerKit(KitInterface pk)
     {
         this.last_player_kit = this.player_kit;
         if (pk == null)
         {
-            PlayerKit empty = new PlayerKit("empty", new ItemStack[0], new ArrayList<>(0), false);
+            Kit empty = new Kit("empty", new ItemStack[0], new ArrayList<>(0), false);
             this.player_kit = empty;
         }
         else this.player_kit = pk;
@@ -65,6 +64,9 @@ public class FFAPlayer
 
     public void restorePlayerKit()
     {
-
+        if (player_kit.isRestorable())
+        {
+            
+        }
     }
 }

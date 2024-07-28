@@ -13,7 +13,8 @@ import java.util.HashMap;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
-import com.gmail.prizmahdiep.objects.PlayerKit;
+import com.gmail.prizmahdiep.objects.Kit;
+import com.gmail.prizmahdiep.objects.KitInterface;
 import com.gmail.prizmahdiep.utils.KitBase64Util;
 
 public class KitDatabase 
@@ -49,14 +50,14 @@ public class KitDatabase
             con.close();
     }
 
-    public void addKit(PlayerKit k) throws SQLException
+    public void addKit(Kit k) throws SQLException
     {
         try (PreparedStatement prepared_statement = con.prepareStatement("INSERT INTO kits (name, storage, effects) VALUES (?, ?, ?)"))
         {
             if (!kitExists(k.getName()))
             {
                 prepared_statement.setString(1, k.getName());
-                prepared_statement.setString(2, KitBase64Util.itemStackArrayToBase64(k.getInventoryContents()));
+                prepared_statement.setString(2, KitBase64Util.itemStackArrayToBase64(k.getInventory()));
                 prepared_statement.setString(3, KitBase64Util.potionEffectCollectionToBase64(k.getPotionEffects()));
                 prepared_statement.setBoolean(4, k.isRestorable());
                 prepared_statement.executeUpdate();
@@ -101,7 +102,7 @@ public class KitDatabase
         return false;
     }
 
-    public PlayerKit getKit(String name) throws SQLException
+    public Kit getKit(String name) throws SQLException
     {
         try (PreparedStatement prepared_statement = con.prepareStatement("SELECT * FROM kits WHERE name = ?"))
         {
@@ -118,7 +119,7 @@ public class KitDatabase
                 ItemStack[] storage = KitBase64Util.itemStackArrayFromBase64(storage_base64);
                 Collection<PotionEffect> effects = KitBase64Util.potionEffectsFromBase64(effects_base64);
 
-                return new PlayerKit(kit_name, storage, effects, restorable);
+                return new Kit(kit_name, storage, effects, restorable);
             }
         }
         catch (SQLException | IOException e)
@@ -128,12 +129,12 @@ public class KitDatabase
         return null;
     }
 
-    public HashMap<String, PlayerKit> getKits() throws SQLException
+    public HashMap<String, KitInterface> getKits() throws SQLException
     {
         try (PreparedStatement preparedStatement = con.prepareStatement("SELECT * FROM kits"))
         {
             ResultSet rs = preparedStatement.executeQuery();
-            HashMap<String, PlayerKit> ret = new HashMap<>();
+            HashMap<String, KitInterface> ret = new HashMap<>();
 
             while (rs.next())
             {
@@ -145,7 +146,7 @@ public class KitDatabase
                 ItemStack[] storage = KitBase64Util.itemStackArrayFromBase64(storage_base64);
                 Collection<PotionEffect> effects = KitBase64Util.potionEffectsFromBase64(effects_base64);
 
-                ret.put(kit_name, new PlayerKit(kit_name, storage, effects, restorable));
+                ret.put(kit_name, (KitInterface) new Kit(kit_name, storage, effects, restorable));
             }
 
             return ret;
