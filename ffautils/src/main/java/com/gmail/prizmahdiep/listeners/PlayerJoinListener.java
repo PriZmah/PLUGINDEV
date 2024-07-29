@@ -25,9 +25,9 @@ public class PlayerJoinListener implements Listener
         teleportToMainSpawn(event.getPlayer());
     }
 
-    private void teleportToMainSpawn(Player player) {
+    private void teleportToMainSpawn(Player player) 
+    {
         if (sup.getMainSpawn() == null || !fph.isOnFFA(player.getUniqueId())) return;
-
         sup.teleportEntityToSpawn(sup.getMainSpawn().getName(), player);
     }
 

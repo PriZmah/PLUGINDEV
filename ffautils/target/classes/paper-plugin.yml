@@ -1,6 +1,6 @@
 name: FFAUtils
 main: com.gmail.prizmahdiep.FFAUtils
-version: 0.2
+version: 0.3
 api-version: '1.20'
 description: Utilidades varias para un FFA
 author: PriZmah/Bochs

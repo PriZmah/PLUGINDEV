@@ -35,12 +35,12 @@ public class FFAPlayer
         return this.last_player_kit;
     }
     
-    public SpawnLocation getPlayerChosenSpawn()
+    public SpawnLocation getChosenSpawn()
     {
         return this.chosen_spawn;
     }
 
-    public SpawnLocation getPlayerLastChosenSpawn()
+    public SpawnLocation getLastChosenSpawn()
     {
         return this.last_chosen_spawn;
     }
@@ -60,13 +60,5 @@ public class FFAPlayer
     {
         this.last_chosen_spawn = this.chosen_spawn;
         this.chosen_spawn = s;
-    }
-
-    public void restorePlayerKit()
-    {
-        if (player_kit.isRestorable())
-        {
-            
-        }
     }
 }

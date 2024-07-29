@@ -8,6 +8,7 @@ import com.gmail.prizmahdiep.events.FFAPlayerUnloadEvent;
 import com.gmail.prizmahdiep.managers.FFAPlayersManager;
 import com.gmail.prizmahdiep.managers.SpawnManager;
 import com.gmail.prizmahdiep.objects.FFAPlayer;
+import com.gmail.prizmahdiep.utils.PlayerUtils;
 
 public class FFAPlayerUnloadListener implements Listener
 {
@@ -21,10 +22,13 @@ public class FFAPlayerUnloadListener implements Listener
     @EventHandler
     public void onPlayerUnload(FFAPlayerUnloadEvent p)
     {
-        Player pj = p.getPlayer();
-        FFAPlayer pf = FFAPlayersManager.ffa_players.get(pj.getUniqueId());
-        pf.getPlayer().getInventory().clear();
-        pf.getPlayer().clearActivePotionEffects();
-        su.teleportEntityToSpawn(pf.getPlayerChosenSpawn().getName(), pj);
+        FFAPlayer pf = FFAPlayersManager.ffa_players.get(p.getPlayer().getUniqueId());
+        Player pi = pf.getPlayer();
+        
+        pi.getInventory().setContents(pf.getPlayerKit().getInventory());;
+        pi.clearActivePotionEffects();
+        pi.addPotionEffects(pf.getPlayerKit().getPotionEffects());
+        su.teleportEntityToSpawn(pf.getChosenSpawn().getName(), pi);
+        PlayerUtils.resetPlayerStatus(pi);
     }
 }

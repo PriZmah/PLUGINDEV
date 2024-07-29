@@ -11,6 +11,7 @@ import org.bukkit.potion.PotionEffect;
 
 import com.gmail.prizmahdiep.FFAUtils;
 import com.gmail.prizmahdiep.database.KitDatabase;
+import com.gmail.prizmahdiep.objects.FFAPlayer;
 import com.gmail.prizmahdiep.objects.Kit;
 import com.gmail.prizmahdiep.objects.KitInterface;
 
@@ -88,5 +89,12 @@ public class KitManager
             e.printStackTrace();
         }
         return kits.size();
+    }
+
+    public void restorePlayerKit(FFAPlayer fp) 
+    {
+        fp.getPlayer().getInventory().setContents(fp.getPlayerKit().getInventory());
+        fp.getPlayer().clearActivePotionEffects();
+        fp.getPlayer().addPotionEffects(fp.getPlayerKit().getPotionEffects());
     }
 }

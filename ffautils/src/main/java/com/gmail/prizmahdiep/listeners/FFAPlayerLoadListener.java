@@ -25,6 +25,6 @@ public class FFAPlayerLoadListener implements Listener
         FFAPlayer fp = event.getFFAPlayer();
         Player p = fp.getPlayer();
         ku.setPlayerKit(fp.getLastPlayerKit().getName(), p);
-        su.teleportEntityToSpawn(fp.getPlayerChosenSpawn().getName(), p);
+        su.teleportEntityToSpawn(fp.getChosenSpawn().getName(), p);
     }
 }

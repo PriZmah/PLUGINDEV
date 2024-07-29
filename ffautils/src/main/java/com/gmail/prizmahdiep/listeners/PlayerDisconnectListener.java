@@ -34,12 +34,12 @@ public class PlayerDisconnectListener implements Listener
             @Override
             public void run() 
             {
-                unloadFromFFA(p);
+                removeFromFFA(p);
             }
         }.runTaskLater(futils, 1);
     }
 
-    public void unloadFromFFA(Player p)
+    private void removeFromFFA(Player p)
     {
         if (!fph.isOnFFA(p.getUniqueId())) return;
 
@@ -55,5 +55,6 @@ public class PlayerDisconnectListener implements Listener
         }
 
         fph.removePlayerFromFFA(p);
+        fph.removePlayerFromIdleFFA(p);
     }
 }
