@@ -34,7 +34,9 @@ public class SpawnManager
         if (spawns.containsKey(name)) return false;
         try 
         {
-            spawn_database.addSpawn(new SpawnLocation(name, loc, type));
+            SpawnLocation loca = new SpawnLocation(name, loc, type);
+            spawn_database.addSpawn(loca);
+            spawns.put(name, loca);
         } catch (SQLException e) 
         {
             e.printStackTrace();
@@ -66,7 +68,8 @@ public class SpawnManager
     {
         try 
         {
-            spawns = spawn_database.getSpawns();
+            spawns.clear();
+            spawns.putAll(spawn_database.getSpawns());
         } catch (SQLException e) 
         {
             e.printStackTrace();

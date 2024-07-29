@@ -30,13 +30,13 @@ public class SpawnDatabase
         try (Statement statement = con.createStatement())
         {
             statement.execute("CREATE TABLE IF NOT EXISTS spawns (" +
-                                "name TEXT PRIMARY KEY" + 
-                                "location_x REAL NOT NULL" + 
-                                "location_y REAL NOT NULL" + 
-                                "location_z REAL NOT NULL" +
-                                "location_pitch REAL NOT NULL" + 
-                                "location_yaw REAL NOT NULL" +
-                                "location_world_name TEXT NOT NULL" +
+                                "name TEXT PRIMARY KEY," + 
+                                "location_x REAL NOT NULL," + 
+                                "location_y REAL NOT NULL," + 
+                                "location_z REAL NOT NULL," +
+                                "location_pitch REAL NOT NULL," + 
+                                "location_yaw REAL NOT NULL," +
+                                "location_world_name TEXT NOT NULL," +
                                 "type TEXT NOT NULL)");
         }
         catch (SQLException e)
@@ -64,7 +64,8 @@ public class SpawnDatabase
                 prepared_statement.setDouble(5, sl.getLocation().getPitch());
                 prepared_statement.setDouble(6, sl.getLocation().getYaw());
                 prepared_statement.setString(7, sl.getLocation().getWorld().getName());   
-                prepared_statement.setString(8, sl.getType());   
+                prepared_statement.setString(8, sl.getType()); 
+                prepared_statement.executeUpdate();  
             }
         }
         catch (SQLException e)

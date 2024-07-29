@@ -61,7 +61,6 @@ public class KitDatabase
                 prepared_statement.setString(3, KitBase64Util.potionEffectCollectionToBase64(k.getPotionEffects()));
                 prepared_statement.setBoolean(4, k.isRestorable());
                 prepared_statement.executeUpdate();
-                prepared_statement.close();
             }
         }
         catch (SQLException e)

@@ -12,6 +12,7 @@
 /home/prizmah/Escritorio/PLUGINDEV/ffautils/src/main/java/com/gmail/prizmahdiep/objects/FFAPlayer.java
 /home/prizmah/Escritorio/PLUGINDEV/ffautils/src/main/java/com/gmail/prizmahdiep/listeners/FFAPlayerLoadListener.java
 /home/prizmah/Escritorio/PLUGINDEV/ffautils/src/main/java/com/gmail/prizmahdiep/objects/KitInterface.java
+/home/prizmah/Escritorio/PLUGINDEV/ffautils/src/main/java/com/gmail/prizmahdiep/database/SpawnDatabase.java
 /home/prizmah/Escritorio/PLUGINDEV/ffautils/src/main/java/com/gmail/prizmahdiep/commands/CommandUnloadme.java
 /home/prizmah/Escritorio/PLUGINDEV/ffautils/src/main/java/com/gmail/prizmahdiep/objects/EditableKit.java
 /home/prizmah/Escritorio/PLUGINDEV/ffautils/src/main/java/com/gmail/prizmahdiep/managers/KitManager.java
@@ -19,7 +20,6 @@
 /home/prizmah/Escritorio/PLUGINDEV/ffautils/src/main/java/com/gmail/prizmahdiep/events/FFAPlayerUnloadEvent.java
 /home/prizmah/Escritorio/PLUGINDEV/ffautils/src/main/java/com/gmail/prizmahdiep/utils/KitBase64Util.java
 /home/prizmah/Escritorio/PLUGINDEV/ffautils/src/main/java/com/gmail/prizmahdiep/commands/CommandHandler.java
-/home/prizmah/Escritorio/PLUGINDEV/ffautils/src/main/java/com/gmail/prizmahdiep/config/SpawnConfig.java
 /home/prizmah/Escritorio/PLUGINDEV/ffautils/src/main/java/com/gmail/prizmahdiep/database/KitDatabase.java
 /home/prizmah/Escritorio/PLUGINDEV/ffautils/src/main/java/com/gmail/prizmahdiep/listeners/PlayerJoinListener.java
 /home/prizmah/Escritorio/PLUGINDEV/ffautils/src/main/java/com/gmail/prizmahdiep/FFAUtils.java
