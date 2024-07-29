@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import com.gmail.prizmahdiep.FFAUtils;
 import com.gmail.prizmahdiep.managers.FFAPlayersManager;
@@ -31,9 +32,11 @@ public class PlayerInteractListener implements Listener
     public void onPlayerInteract(PlayerInteractEvent ev)
     {
         Player p = ev.getPlayer();
-        if (p.getInventory().getItemInMainHand()
-        .getItemMeta()
-        .getPersistentDataContainer()
+        ItemMeta item_meta = p.getInventory().getItemInMainHand().getItemMeta();
+
+        if (item_meta == null) return;
+
+        if (item_meta.getPersistentDataContainer()
         .has(NamespacedKey.fromString("respawn-item-type")) && fph.isIdle(p.getUniqueId()))
         {
             FFAPlayer fp = FFAPlayersManager.ffa_players.get(p.getUniqueId());

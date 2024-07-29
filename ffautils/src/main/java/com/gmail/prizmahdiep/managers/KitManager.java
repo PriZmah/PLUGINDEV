@@ -53,6 +53,8 @@ public class KitManager
         try 
         {
             kit_database.removeKit(kitname);
+            kits.remove(kitname);
+            return true;
         } 
         catch (SQLException e) 
         {

@@ -33,11 +33,11 @@ public class KitDatabase
         
         try (Statement statement = con.createStatement())
         {
-            statement.execute("CREATE TABLE IF NOT EXIST kits (" + 
-                                "name TEXT PRIMARY KEY, " +
+            statement.execute("CREATE TABLE IF NOT EXISTS kits (" + 
+                                "name TEXT PRIMARY KEY," +
                                 "storage TEXT NOT NULL," +
-                                "effects TEXT NOT NULL" + 
-                                "restorable INTEGER NOT NULL");
+                                "effects TEXT NOT NULL," + 
+                                "restorable INTEGER NOT NULL)");
         } catch (SQLException e) 
         {
             e.printStackTrace();
@@ -52,7 +52,7 @@ public class KitDatabase
 
     public void addKit(Kit k) throws SQLException
     {
-        try (PreparedStatement prepared_statement = con.prepareStatement("INSERT INTO kits (name, storage, effects) VALUES (?, ?, ?)"))
+        try (PreparedStatement prepared_statement = con.prepareStatement("INSERT INTO kits (name, storage, effects, restorable) VALUES (?, ?, ?, ?)"))
         {
             if (!kitExists(k.getName()))
             {

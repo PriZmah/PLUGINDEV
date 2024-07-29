@@ -35,16 +35,17 @@ public class FFAUtils extends JavaPlugin
     {
         getLogger().info("Starting FFAUtils");
         if (!getDataFolder().exists()) getDataFolder().mkdir();
-        
-        kit_handler = new KitManager(this, kit_database);
-        spawn_config = new SpawnConfig(this);
-        ffa_players_handler = new FFAPlayersManager();
-        spawn_handler = new SpawnManager(this, spawn_config);
-        command_handler = new CommandHandler(new PaperCommandManager(this));
-        spawn_config.createSpawnConfiguration();
-        kit_database = new KitDatabase(getDataFolder().getAbsolutePath() + "/kits.db");
-    
 
+        kit_database = new KitDatabase(getDataFolder().getAbsolutePath() + "/kits.db");
+        kit_handler = new KitManager(this, kit_database);
+
+        spawn_config = new SpawnConfig(this);
+        spawn_config.createSpawnConfiguration();
+
+        spawn_handler = new SpawnManager(this, spawn_config);
+        ffa_players_handler = new FFAPlayersManager();
+
+        command_handler = new CommandHandler(new PaperCommandManager(this));
         command_handler.registerCommands(spawn_handler, kit_handler, ffa_players_handler);
         registerFFAUtilsEvents();
     }
