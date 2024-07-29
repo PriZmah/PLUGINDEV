@@ -37,10 +37,10 @@ public class FFAPlayersManager
     public boolean addPlayerToFFA(Player p, KitInterface k, SpawnLocation s)
     {  
         UUID piud = p.getUniqueId();
-        FFAPlayer pf = new FFAPlayer(p, k, s);
         if (isOnFFA(piud)) return false;
-        else ffa_players.put(p.getUniqueId(), pf);
-
+        
+        FFAPlayer pf = new FFAPlayer(p, k, s);
+        ffa_players.put(p.getUniqueId(), pf);
         Bukkit.getServer().getPluginManager().callEvent(new FFAPlayerLoadEvent(pf));
         return true;
     }

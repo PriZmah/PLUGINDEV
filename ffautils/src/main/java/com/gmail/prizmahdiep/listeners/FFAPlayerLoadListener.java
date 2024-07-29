@@ -19,12 +19,14 @@ public class FFAPlayerLoadListener implements Listener
         this.su = su;
         this.ku = ku;
     }
+    
     @EventHandler
     public void onFFAPlayerLoad(FFAPlayerLoadEvent event) 
     {
         FFAPlayer fp = event.getFFAPlayer();
         Player p = fp.getPlayer();
         ku.setPlayerKit(fp.getPlayerKit().getName(), p);
+   
         su.teleportEntityToSpawn(fp.getChosenSpawn().getName(), p);
     }
 }

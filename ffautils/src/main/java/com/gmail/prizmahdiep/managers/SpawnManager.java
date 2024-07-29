@@ -2,25 +2,26 @@ package com.gmail.prizmahdiep.managers;
 
 import java.util.Map;
 import java.util.Set;
+import java.sql.SQLException;
 import java.util.HashMap;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 
 import com.gmail.prizmahdiep.FFAUtils;
-import com.gmail.prizmahdiep.config.SpawnConfig;
+import com.gmail.prizmahdiep.database.SpawnDatabase;
 import com.gmail.prizmahdiep.objects.SpawnLocation;
 
 public class SpawnManager
 {
     public static Map<String, SpawnLocation> spawns;
     private FFAUtils plugin;
-    private SpawnConfig spawn_cfg;
+    private SpawnDatabase spawn_database;
     
-    public SpawnManager(FFAUtils pl, SpawnConfig scfg)
+    public SpawnManager(FFAUtils pl, SpawnDatabase spawn_database)
     {
         this.plugin = pl;
-        this.spawn_cfg = scfg;
+        this.spawn_database = spawn_database;
         spawns = new HashMap<>();
         reloadSpawns();
     }
@@ -34,18 +35,26 @@ public class SpawnManager
     public boolean createSpawn(String name, Location loc, String type)
     {
         if (spawns.containsKey(name)) return false;
-
-        SpawnLocation m = new SpawnLocation(name, loc, type);
-        if (!spawn_cfg.createSpawnConfigEntry(m)) return false;
-
-        spawns.put(name, m);
+        try 
+        {
+            spawn_database.addSpawn(new SpawnLocation(name, loc, type));
+        } catch (SQLException e) 
+        {
+            e.printStackTrace();
+        }
         return true;
     }
 
     public boolean removeSpawn(String name)
     {
-        if (!spawn_cfg.removeSpawnConfigEntry(name)) return false;
-        spawns.remove(name);
+        if (spawns.containsKey(name)) spawns.remove(name);
+        try 
+        {
+            spawn_database.removeSpawn(name);
+        } catch (SQLException e) 
+        {
+            e.printStackTrace();
+        }
         return true;
     }
 
@@ -58,12 +67,15 @@ public class SpawnManager
     
     public int reloadSpawns() 
     {
-        int loaded_spawns = 0;
-        spawns = spawn_cfg.getSpawnObjects();
-        
-        loaded_spawns = spawns.size();
-        plugin.getLogger().info(loaded_spawns + " spawns loaded");
-        return loaded_spawns;
+        try 
+        {
+            spawns = spawn_database.getSpawns();
+        } catch (SQLException e) 
+        {
+            e.printStackTrace();
+        }
+    
+        return spawns.size();
     }
 
     public SpawnLocation getMainSpawn()

@@ -5,8 +5,8 @@ import java.sql.SQLException;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.gmail.prizmahdiep.commands.CommandHandler;
-import com.gmail.prizmahdiep.config.SpawnConfig;
 import com.gmail.prizmahdiep.database.KitDatabase;
+import com.gmail.prizmahdiep.database.SpawnDatabase;
 import com.gmail.prizmahdiep.listeners.FFAPlayerLoadListener;
 import com.gmail.prizmahdiep.listeners.FFAPlayerUnloadListener;
 import com.gmail.prizmahdiep.listeners.PlayerDeathListener;
@@ -23,12 +23,12 @@ import co.aikar.commands.PaperCommandManager;
 
 public class FFAUtils extends JavaPlugin
 {
-    private SpawnConfig spawn_config;
     private FFAPlayersManager ffa_players_handler;
     private SpawnManager spawn_handler;
     private KitManager kit_handler;
     private CommandHandler command_handler;
     private KitDatabase kit_database;
+    private SpawnDatabase spawn_database;
     
     @Override
     public void onEnable()
@@ -39,10 +39,10 @@ public class FFAUtils extends JavaPlugin
         kit_database = new KitDatabase(getDataFolder().getAbsolutePath() + "/kits.db");
         kit_handler = new KitManager(this, kit_database);
 
-        spawn_config = new SpawnConfig(this);
-        spawn_config.createSpawnConfiguration();
+        spawn_database = new SpawnDatabase(getDataFolder().getAbsolutePath() + "/spawns.db");
+        spawn_handler = new SpawnManager(this, spawn_database);
+        
 
-        spawn_handler = new SpawnManager(this, spawn_config);
         ffa_players_handler = new FFAPlayersManager();
 
         command_handler = new CommandHandler(new PaperCommandManager(this));
@@ -56,6 +56,7 @@ public class FFAUtils extends JavaPlugin
         try 
         {
             kit_database.closeConnection();
+            spawn_database.closeConnection();
         } catch (SQLException e) 
         {
             e.printStackTrace();

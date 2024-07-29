@@ -91,7 +91,8 @@ public class CommandFFAUtils extends BaseCommand
                     Bukkit.getPlayer(uuid).getName() 
                     + ChatColor.YELLOW + " - " 
                     + ChatColor.GRAY + ffaplayer.getPlayerKit().getName()
-                    + ChatColor.DARK_GRAY + "(" + ffaplayer.getLastPlayerKit().getName() + ")"
+                    + ChatColor.DARK_GRAY + "(" + 
+                    ffaplayer.getLastPlayerKit() != null ? ffaplayer.getLastPlayerKit().getName() : "" + ")"
                 )
             );
         }
@@ -122,7 +123,7 @@ public class CommandFFAUtils extends BaseCommand
             Collection<PotionEffect> pf = p.getActivePotionEffects();
 
 
-            if (ku.createKit(kit_name.toUpperCase(), items, pf, Boolean.getBoolean(restorable)))
+            if (ku.createKit(kit_name.toUpperCase(), items, pf, Boolean.valueOf(restorable)))
                 p.sendMessage(ChatColor.AQUA + "Kit " + kit_name + " created");
             else
                 p.sendMessage(ChatColor.RED + "Kit " + kit_name + " already exist");
@@ -389,17 +390,13 @@ public class CommandFFAUtils extends BaseCommand
 
         FFAPlayer ffaplayer;
         int set_size = FFAPlayersManager.ffa_players.keySet().size();
+        UUID[] player_keys = FFAPlayersManager.ffa_players.keySet().toArray(new UUID[set_size]);
+        
         for (int i = 0; i < set_size; i++)
         {
-            UUID[] player_keys = FFAPlayersManager.ffa_players.keySet().toArray(new UUID[set_size]);
             ffaplayer = FFAPlayersManager.ffa_players.get(player_keys[i]);
-
             ffaplayer.setPlayerKit(null);
-            ffaplayer.setPlayerKit(null);
-    
             ffaplayer.setPlayerSpawn(main_spawn);
-            ffaplayer.setPlayerSpawn(main_spawn);
-    
             fph.removePlayerFromFFA(ffaplayer.getPlayer());
         }
     }

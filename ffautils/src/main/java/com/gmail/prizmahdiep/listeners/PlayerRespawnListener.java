@@ -15,6 +15,7 @@ import com.gmail.prizmahdiep.FFAUtils;
 import com.gmail.prizmahdiep.managers.FFAPlayersManager;
 import com.gmail.prizmahdiep.objects.FFAPlayer;
 
+import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatColor;
 
 public class PlayerRespawnListener implements Listener
@@ -44,19 +45,17 @@ public class PlayerRespawnListener implements Listener
 
     private void resetPlayer(Player p) 
     {
-        if (!fph.isOnFFA(p.getUniqueId())) return;
+        fph.movePlayerFromFFA(p);
+        if (!fph.isIdle(p.getUniqueId())) return;
 
         ItemStack respawn_item = new ItemStack(Material.PINK_DYE);
         NamespacedKey key = new NamespacedKey(futils, "respawn-item-type");
         ItemMeta respawn_item_meta = respawn_item.getItemMeta();
         respawn_item_meta.getPersistentDataContainer().set(key, PersistentDataType.BOOLEAN, true);
-        respawn_item_meta.displayName().replaceText((a) ->
-                a.replacement(ChatColor.LIGHT_PURPLE + "Respawn to last location")
-        );
+        respawn_item_meta.displayName(Component.text(ChatColor.LIGHT_PURPLE + "Respawn to last location"));
         respawn_item.setItemMeta(respawn_item_meta);
 
-        FFAPlayer pf = FFAPlayersManager.ffa_players.get(p.getUniqueId());
-        fph.movePlayerFromFFA(p);
+        FFAPlayer pf = FFAPlayersManager.idle_ffa_players.get(p.getUniqueId());
         pf.getPlayer().getInventory().setItemInMainHand(respawn_item);
     }
 }

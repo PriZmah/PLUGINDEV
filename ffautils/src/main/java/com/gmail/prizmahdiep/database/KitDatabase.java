@@ -50,7 +50,7 @@ public class KitDatabase
             con.close();
     }
 
-    public void addKit(Kit k) throws SQLException
+    public void addKit(KitInterface k) throws SQLException
     {
         try (PreparedStatement prepared_statement = con.prepareStatement("INSERT INTO kits (name, storage, effects, restorable) VALUES (?, ?, ?, ?)"))
         {
