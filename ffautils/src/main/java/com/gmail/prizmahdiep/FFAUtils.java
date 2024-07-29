@@ -40,7 +40,7 @@ public class FFAUtils extends JavaPlugin
         kit_handler = new KitManager(this, kit_database);
 
         spawn_database = new SpawnDatabase(getDataFolder().getAbsolutePath() + "/spawns.db");
-        spawn_handler = new SpawnManager(this, spawn_database);
+        spawn_handler = new SpawnManager(spawn_database);
         
 
         ffa_players_handler = new FFAPlayersManager();
@@ -71,7 +71,7 @@ public class FFAUtils extends JavaPlugin
         getServer().getPluginManager().registerEvents(new FFAPlayerUnloadListener(/*ku,*/ spawn_handler), this);
         getServer().getPluginManager().registerEvents(new PlayerDisconnectListener(ffa_players_handler, spawn_handler, this), this);
         getServer().getPluginManager().registerEvents(new PlayerRespawnListener(ffa_players_handler, this), this);
-        getServer().getPluginManager().registerEvents(new PlayerDeathListener(ffa_players_handler, kit_handler, this), this);
+        getServer().getPluginManager().registerEvents(new PlayerDeathListener(ffa_players_handler, kit_handler), this);
         getServer().getPluginManager().registerEvents(new PlayerInteractListener(spawn_handler, kit_handler, ffa_players_handler, this), this);
     }
 }

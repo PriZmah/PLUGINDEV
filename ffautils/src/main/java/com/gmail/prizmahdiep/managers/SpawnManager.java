@@ -8,19 +8,16 @@ import java.util.HashMap;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 
-import com.gmail.prizmahdiep.FFAUtils;
 import com.gmail.prizmahdiep.database.SpawnDatabase;
 import com.gmail.prizmahdiep.objects.SpawnLocation;
 
 public class SpawnManager
 {
     public static Map<String, SpawnLocation> spawns;
-    private FFAUtils plugin;
     private SpawnDatabase spawn_database;
     
-    public SpawnManager(FFAUtils pl, SpawnDatabase spawn_database)
+    public SpawnManager(SpawnDatabase spawn_database)
     {
-        this.plugin = pl;
         this.spawn_database = spawn_database;
         spawns = new HashMap<>();
         reloadSpawns();

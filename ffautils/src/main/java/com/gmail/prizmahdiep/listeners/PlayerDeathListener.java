@@ -17,15 +17,13 @@ import net.md_5.bungee.api.ChatColor;
 
 public class PlayerDeathListener implements Listener
 {
-    //private FFAUtils futils;
     private FFAPlayersManager fph;
     private KitManager km;
 
-    public PlayerDeathListener(FFAPlayersManager fph, KitManager km, FFAUtils futils) 
+    public PlayerDeathListener(FFAPlayersManager fph, KitManager km) 
     {
         this.fph = fph;
         this.km = km;
-        //this.futils = futils;
     }
 
     @EventHandler
