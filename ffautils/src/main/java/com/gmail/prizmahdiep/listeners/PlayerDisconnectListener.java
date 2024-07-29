@@ -4,7 +4,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import com.gmail.prizmahdiep.FFAUtils;
 import com.gmail.prizmahdiep.managers.FFAPlayersManager;
@@ -16,13 +15,12 @@ public class PlayerDisconnectListener implements Listener
 {
     private FFAPlayersManager fph;
     private SpawnManager sup;
-    private FFAUtils futils;
 
-    public PlayerDisconnectListener(FFAPlayersManager fph, SpawnManager sup, FFAUtils futils)
+
+    public PlayerDisconnectListener(FFAPlayersManager fph, SpawnManager sup)
     {
         this.fph = fph;
         this.sup = sup;
-        this.futils = futils;
     }
 
     @EventHandler
@@ -30,13 +28,7 @@ public class PlayerDisconnectListener implements Listener
     {
         Player p = e.getPlayer();
         
-        new BukkitRunnable() {
-            @Override
-            public void run() 
-            {
-                removeFromFFA(p);
-            }
-        }.runTaskLater(futils, 1);
+        removeFromFFA(p);
     }
 
     private void removeFromFFA(Player p)

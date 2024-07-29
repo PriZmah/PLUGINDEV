@@ -17,11 +17,13 @@ public class FFAPlayersManager
 {
     public static Map<UUID, FFAPlayer> ffa_players;
     public static Map<UUID, FFAPlayer> idle_ffa_players;
+    private SpawnManager sm;
 
-    public FFAPlayersManager()
+    public FFAPlayersManager(SpawnManager sm)
     {
         ffa_players = new HashMap<>();
         idle_ffa_players = new HashMap<>();
+        this.sm = sm;
     }
 
     public boolean isOnFFA(UUID p)
@@ -48,13 +50,9 @@ public class FFAPlayersManager
     public boolean movePlayerFromFFA(Player p)
     {
         UUID piud = p.getUniqueId();
-        if (isOnFFA(piud)) 
-        {
-            Bukkit.getServer().getPluginManager().callEvent(new FFAPlayerUnloadEvent(p));
-            idle_ffa_players.put(piud, ffa_players.get(piud));
-            ffa_players.remove(piud);
-        }
-        else return false;
+        removePlayerFromFFA(p);
+        idle_ffa_players.put(piud, new FFAPlayer(p, null, sm.getMainSpawn()));
+        Bukkit.getServer().getPluginManager().callEvent(new FFAPlayerUnloadEvent(p));
         return true;
     }
 
@@ -75,7 +73,6 @@ public class FFAPlayersManager
         UUID piud = p.getUniqueId();
         if (isIdle(piud))
         {
-            Bukkit.getServer().getPluginManager().callEvent(new FFAPlayerUnloadEvent(p));
             idle_ffa_players.remove(piud);
         }
     }

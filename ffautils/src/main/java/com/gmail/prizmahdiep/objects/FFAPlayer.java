@@ -3,8 +3,10 @@ package com.gmail.prizmahdiep.objects;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.UUID;
 
 public class FFAPlayer
@@ -16,7 +18,8 @@ public class FFAPlayer
     public FFAPlayer(Player p, KitInterface pk, SpawnLocation spawn)
     {
         this.player_uuid = p.getUniqueId();
-        this.player_kit = pk;
+        if (pk == null) player_kit = new Kit("empty", new ItemStack[0], new ArrayList<>(0), false);
+        else this.player_kit = pk;
         this.chosen_spawn = spawn;
     }
 

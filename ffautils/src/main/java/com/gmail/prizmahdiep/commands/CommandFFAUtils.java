@@ -92,7 +92,7 @@ public class CommandFFAUtils extends BaseCommand
                     + ChatColor.YELLOW + " - " 
                     + ChatColor.GRAY + ffaplayer.getPlayerKit().getName()
                     + ChatColor.DARK_GRAY + "(" + 
-                    ffaplayer.getLastPlayerKit() != null ? ffaplayer.getLastPlayerKit().getName() : "" + ")"
+                    (ffaplayer.getLastPlayerKit() != null ? ffaplayer.getLastPlayerKit().getName() : "" + ")")
                 )
             );
         }

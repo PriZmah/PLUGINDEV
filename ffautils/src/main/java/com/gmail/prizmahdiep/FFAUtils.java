@@ -43,7 +43,7 @@ public class FFAUtils extends JavaPlugin
         spawn_handler = new SpawnManager(spawn_database);
         
 
-        ffa_players_handler = new FFAPlayersManager();
+        ffa_players_handler = new FFAPlayersManager(spawn_handler);
 
         command_handler = new CommandHandler(new PaperCommandManager(this));
         command_handler.registerCommands(spawn_handler, kit_handler, ffa_players_handler);
@@ -69,7 +69,7 @@ public class FFAUtils extends JavaPlugin
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(spawn_handler, ffa_players_handler), this);
         getServer().getPluginManager().registerEvents(new FFAPlayerLoadListener(kit_handler, spawn_handler), this);
         getServer().getPluginManager().registerEvents(new FFAPlayerUnloadListener(/*ku,*/ spawn_handler), this);
-        getServer().getPluginManager().registerEvents(new PlayerDisconnectListener(ffa_players_handler, spawn_handler, this), this);
+        getServer().getPluginManager().registerEvents(new PlayerDisconnectListener(ffa_players_handler, spawn_handler), this);
         getServer().getPluginManager().registerEvents(new PlayerRespawnListener(ffa_players_handler, this), this);
         getServer().getPluginManager().registerEvents(new PlayerDeathListener(ffa_players_handler, kit_handler), this);
         getServer().getPluginManager().registerEvents(new PlayerInteractListener(spawn_handler, kit_handler, ffa_players_handler, this), this);
