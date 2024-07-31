@@ -81,10 +81,9 @@ public class SpawnManager
     public SpawnLocation getMainSpawn()
     {
         for (SpawnLocation i : spawns.values())
-        {
             if (i.getType().equals(SpawnLocation.SPAWN))
                 return i;
-        }
+        
         return null;
     }
 }

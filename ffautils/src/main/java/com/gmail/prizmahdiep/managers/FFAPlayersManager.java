@@ -43,6 +43,10 @@ public class FFAPlayersManager
         
         FFAPlayer pf = new FFAPlayer(p, k, s);
         ffa_players.put(p.getUniqueId(), pf);
+
+        if (idle_ffa_players.containsKey(piud))
+            idle_ffa_players.remove(piud);
+
         Bukkit.getServer().getPluginManager().callEvent(new FFAPlayerLoadEvent(pf));
         return true;
     }
@@ -50,9 +54,8 @@ public class FFAPlayersManager
     public boolean movePlayerFromFFA(Player p)
     {
         UUID piud = p.getUniqueId();
-        removePlayerFromFFA(p);
         idle_ffa_players.put(piud, new FFAPlayer(p, null, sm.getMainSpawn()));
-        Bukkit.getServer().getPluginManager().callEvent(new FFAPlayerUnloadEvent(p));
+        removePlayerFromFFA(p);
         return true;
     }
 
@@ -61,6 +64,7 @@ public class FFAPlayersManager
         UUID piud = p.getUniqueId();
         if (isOnFFA(piud)) 
         {
+            ffa_players.get(piud).setPlayerSpawn(sm.getMainSpawn());
             Bukkit.getServer().getPluginManager().callEvent(new FFAPlayerUnloadEvent(p));
             ffa_players.remove(piud);
         }

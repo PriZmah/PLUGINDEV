@@ -26,7 +26,6 @@ com/gmail/prizmahdiep/commands/CommandUnloadme.class
 com/gmail/prizmahdiep/listeners/PlayerDeathListener.class
 com/gmail/prizmahdiep/managers/FFAPlayersManager.class
 com/gmail/prizmahdiep/commands/CommandHandler.class
-com/gmail/prizmahdiep/listeners/PlayerDisconnectListener$1.class
 com/gmail/prizmahdiep/FFAUtils.class
 com/gmail/prizmahdiep/managers/SpawnManager.class
 com/gmail/prizmahdiep/commands/CommandFFAUtils$CommandCreate.class

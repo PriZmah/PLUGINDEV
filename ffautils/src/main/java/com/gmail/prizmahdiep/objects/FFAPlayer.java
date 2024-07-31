@@ -3,10 +3,8 @@ package com.gmail.prizmahdiep.objects;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.UUID;
 
 public class FFAPlayer
