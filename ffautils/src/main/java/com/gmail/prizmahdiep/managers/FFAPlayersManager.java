@@ -17,13 +17,11 @@ public class FFAPlayersManager
 {
     public static Map<UUID, FFAPlayer> ffa_players;
     public static Map<UUID, FFAPlayer> idle_ffa_players;
-    private SpawnManager sm;
 
-    public FFAPlayersManager(SpawnManager sm)
+    public FFAPlayersManager()
     {
         ffa_players = new HashMap<>();
         idle_ffa_players = new HashMap<>();
-        this.sm = sm;
     }
 
     public boolean isOnFFA(UUID p)
@@ -44,27 +42,36 @@ public class FFAPlayersManager
         FFAPlayer pf = new FFAPlayer(p, k, s);
         ffa_players.put(p.getUniqueId(), pf);
 
-        if (idle_ffa_players.containsKey(piud))
-            idle_ffa_players.remove(piud);
-
         Bukkit.getServer().getPluginManager().callEvent(new FFAPlayerLoadEvent(pf));
         return true;
     }
 
-    public boolean movePlayerFromFFA(Player p)
+    public boolean movePlayerFromFFA(FFAPlayer p)
     {
-        UUID piud = p.getUniqueId();
-        idle_ffa_players.put(piud, new FFAPlayer(p, null, sm.getMainSpawn()));
+        UUID piud = p.getUUID();
+        idle_ffa_players.put(piud, p);
         removePlayerFromFFA(p);
         return true;
     }
 
-    public boolean removePlayerFromFFA(Player p)
+    public boolean movePlayerFromIdle(FFAPlayer p)
     {
-        UUID piud = p.getUniqueId();
+        UUID piud = p.getUUID();
+        if (!isIdle(piud)) return false;
+        p.setPlayerKit(p.getLastPlayerKit());
+        p.setPlayerSpawn(p.getLastChosenSpawn());
+
+        ffa_players.put(piud, p);
+        removePlayerFromIdle(p);
+        Bukkit.getServer().getPluginManager().callEvent(new FFAPlayerLoadEvent(p));
+        return true;
+    }
+
+    public boolean removePlayerFromFFA(FFAPlayer p)
+    {
+        UUID piud = p.getUUID();
         if (isOnFFA(piud)) 
         {
-            ffa_players.get(piud).setPlayerSpawn(sm.getMainSpawn());
             Bukkit.getServer().getPluginManager().callEvent(new FFAPlayerUnloadEvent(p));
             ffa_players.remove(piud);
         }
@@ -72,12 +79,10 @@ public class FFAPlayersManager
         return true;
     }
 
-    public void removePlayerFromIdleFFA(Player p) 
+    public void removePlayerFromIdle(FFAPlayer p) 
     {
-        UUID piud = p.getUniqueId();
+        UUID piud = p.getUUID();
         if (isIdle(piud))
-        {
             idle_ffa_players.remove(piud);
-        }
     }
 }

@@ -18,6 +18,7 @@ public class PlayerDeathListener implements Listener
 {
     private FFAPlayersManager fph;
     private KitManager km;
+    private Player victim, killer;
 
     public PlayerDeathListener(FFAPlayersManager fph, KitManager km) 
     {
@@ -28,32 +29,24 @@ public class PlayerDeathListener implements Listener
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent ev)
     {
+        victim = ev.getEntity();
+        killer = ev.getEntity().getKiller();
+
+        if (fph.isOnFFA(victim.getUniqueId()))
+            ev.getDrops().clear();
+        
         if (ev.getPlayer().getLastDamageCause().getCause().equals(DamageCause.ENTITY_ATTACK))
-        {
-            /*new BukkitRunnable() {
-                @Override
-                public void run()
-                {
-                }
-                
-            }.runTaskLater(futils, 1);*/
             clean(ev);
-        }
     }
     
     private void clean(PlayerDeathEvent ev) 
     {   
-        Player victim = ev.getEntity();
-        Player killer = ev.getEntity().getKiller();
   
         double max_health = 0;
         double current_health = 0;
         double needed_health = 0;
 
         if (fph.isOnFFA(victim.getUniqueId()))
-            ev.getDrops().clear();
-        
-        
             
             if (fph.isOnFFA((killer.getUniqueId())))
             {
@@ -65,11 +58,11 @@ public class PlayerDeathListener implements Listener
                 
                 if (fph.isOnFFA(victim.getUniqueId()))
                     ev.deathMessage(Component.text(ChatColor.RED + victim.getName() + ChatColor.YELLOW + " was slain by " 
-                    + ChatColor.GREEN + killer.getName() + ChatColor.YELLOW + " with " + String.valueOf(current_health) + " HP"));
+                    + ChatColor.GREEN + killer.getName() + ChatColor.YELLOW + " with " + String.valueOf((double) Math.round(current_health * 100) / 100) + " HP"));
                 
-            FFAPlayer fp = FFAPlayersManager.ffa_players.get(killer.getUniqueId());
-            if (fp.getPlayerKit().isRestorable())
-                km.restorePlayerKit(fp);
-        }
+                FFAPlayer fp = FFAPlayersManager.ffa_players.get(killer.getUniqueId());
+                if (fp.getPlayerKit().isRestorable())
+                    km.restorePlayerKit(fp);
+            }
     }
 }

@@ -3,13 +3,14 @@ package com.gmail.prizmahdiep.events;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-import org.bukkit.entity.Player;
+import com.gmail.prizmahdiep.objects.FFAPlayer;
+
 import org.bukkit.event.Cancellable;
 
 public class FFAPlayerUnloadEvent extends Event implements Cancellable
 {
     private boolean isCancelled;
-    private Player p;
+    private FFAPlayer p;
     private static final HandlerList HANDLERS = new HandlerList();
 
     public static HandlerList getHandlerList() 
@@ -17,7 +18,7 @@ public class FFAPlayerUnloadEvent extends Event implements Cancellable
         return HANDLERS;
     }
 
-    public FFAPlayerUnloadEvent(Player p) 
+    public FFAPlayerUnloadEvent(FFAPlayer p) 
     {
         this.isCancelled = false;
         this.p = p;
@@ -39,7 +40,7 @@ public class FFAPlayerUnloadEvent extends Event implements Cancellable
         this.isCancelled = isCancelled;
     }
 
-    public Player getPlayer()
+    public FFAPlayer getFFAPlayer()
     {
         return this.p;
     }

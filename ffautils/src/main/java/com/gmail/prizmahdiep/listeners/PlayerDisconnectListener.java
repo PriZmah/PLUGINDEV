@@ -9,6 +9,7 @@ import com.gmail.prizmahdiep.managers.FFAPlayersManager;
 import com.gmail.prizmahdiep.managers.SpawnManager;
 import com.gmail.prizmahdiep.objects.FFAPlayer;
 import com.gmail.prizmahdiep.objects.SpawnLocation;
+import com.gmail.prizmahdiep.utils.PlayerUtils;
 
 public class PlayerDisconnectListener implements Listener
 {
@@ -32,20 +33,30 @@ public class PlayerDisconnectListener implements Listener
 
     private void removeFromFFA(Player p)
     {
-        if (!fph.isOnFFA(p.getUniqueId())) return;
-
-        FFAPlayer pf = FFAPlayersManager.ffa_players.get(p.getUniqueId());
-        SpawnLocation main_spawn = sup.getMainSpawn(); 
-        pf.setPlayerKit(null);
-        pf.setPlayerKit(null);
-        
-        if (main_spawn != null)
+        if (!(fph.isOnFFA(p.getUniqueId()) || fph.isIdle(p.getUniqueId())))
         {
-            pf.setPlayerSpawn(main_spawn);
-            pf.setPlayerSpawn(main_spawn);
+            if (!p.hasPermission("ffautils.admin"))
+            {
+                PlayerUtils.resetPlayerStatus(p);
+                sup.teleportEntityToSpawn(sup.getMainSpawn().getName(), p);
+                p.getInventory().clear();
+                p.clearActivePotionEffects();
+            }
+            return;
         }
 
-        fph.removePlayerFromFFA(p);
-        fph.removePlayerFromIdleFFA(p);
+        FFAPlayer pf = FFAPlayersManager.ffa_players.get(p.getUniqueId());
+        if (pf != null)
+        {
+            SpawnLocation main_spawn = sup.getMainSpawn(); 
+            pf.setPlayerKit(null);
+        
+            if (main_spawn != null)
+                pf.setPlayerSpawn(main_spawn);
+        
+
+            fph.removePlayerFromFFA(pf);
+        }
+        fph.removePlayerFromIdle(pf);
     }
 }

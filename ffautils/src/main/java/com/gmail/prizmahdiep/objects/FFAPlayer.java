@@ -46,6 +46,11 @@ public class FFAPlayer
         return this.last_chosen_spawn;
     }
 
+    public UUID getUUID()
+    {
+        return this.player_uuid;
+    }
+
     public void setPlayerKit(KitInterface pk)
     {
         this.last_player_kit = this.player_kit;

@@ -1,9 +1,6 @@
 package com.gmail.prizmahdiep.objects;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
-
-import com.gmail.prizmahdiep.managers.SpawnManager;
 
 public class SpawnLocation 
 {
@@ -21,27 +18,6 @@ public class SpawnLocation
         this.name = name;
         this.location = location;
         this.type = type;
-        if (type != null)
-        {
-            if (type.equals(SPAWN))
-            {
-                SpawnManager.spawns.forEach((spawn_name, spawn) -> 
-                    {
-                        if (spawn.getType().equals(SPAWN))
-                        {
-                            Bukkit.getServer().getLogger().warning("Tried to create more than one spawn locations of type SPAWN");
-                            this.type = STANDARD;
-                            return;
-                        }
-                    }
-                );
-            }
-            if (!type.equals(STANDARD) && !type.equals(SPAWN) && !type.equals(FTN) && !type.equals(EDITOR_ROOM))
-            {
-                this.type = STANDARD;
-            }
-        }
-
     }
 
     public String getName()
@@ -62,5 +38,10 @@ public class SpawnLocation
     public void setType(String type)
     {
         this.type = type;
+    }
+
+    public boolean equals(SpawnLocation other)
+    {
+        return this.name.equals(other.getName());
     }
 }

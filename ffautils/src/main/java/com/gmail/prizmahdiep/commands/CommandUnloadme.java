@@ -1,6 +1,5 @@
 package com.gmail.prizmahdiep.commands;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import com.gmail.prizmahdiep.managers.FFAPlayersManager;
@@ -15,7 +14,7 @@ import co.aikar.commands.annotation.Default;
 import net.md_5.bungee.api.ChatColor;
 
 @CommandPermission("ffautils.unloadme")
-@CommandAlias("unloadme|unldme")
+@CommandAlias("unloadme|unldme|spawn|reset|k|die")
 public class CommandUnloadme extends BaseCommand
 {
     private FFAPlayersManager fph;
@@ -36,21 +35,18 @@ public class CommandUnloadme extends BaseCommand
         if (ffap == null)
         {
             p.sendMessage(ChatColor.RED + "You are not in FFA");
-            Bukkit.getServer().getLogger().warning("Tried to unload an unloaded player");
             return;
         }
         
-        ffap.setPlayerKit(null);
         ffap.setPlayerKit(null);
         
         if (main_spawn != null)
         {
             ffap.setPlayerSpawn(main_spawn);
-            ffap.setPlayerSpawn(main_spawn);
         }
         else p.sendMessage(ChatColor.RED + "Main spawn does not exist");
 
 
-        fph.removePlayerFromFFA(p);
+        fph.movePlayerFromFFA(ffap);
     }
 }

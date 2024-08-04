@@ -4,10 +4,10 @@ import java.util.Collection;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 
 import com.gmail.prizmahdiep.managers.FFAPlayersManager;
@@ -92,7 +92,7 @@ public class CommandFFAUtils extends BaseCommand
                     + ChatColor.YELLOW + " - " 
                     + ChatColor.GRAY + ffaplayer.getPlayerKit().getName()
                     + ChatColor.DARK_GRAY + "(" + 
-                    (ffaplayer.getLastPlayerKit() != null ? ffaplayer.getLastPlayerKit().getName() : "" + ")")
+                    (ffaplayer.getLastPlayerKit() != null ? ffaplayer.getLastPlayerKit().getName() + ")": "" + ")")
                 )
             );
         }
@@ -112,14 +112,25 @@ public class CommandFFAUtils extends BaseCommand
         @CommandCompletion("name true|false")
         public void onCreateKit(Player p, String kit_name, @Optional @Default("false") String restorable)
         {
-            PlayerInventory pinv = p.getInventory();
-            if (pinv.isEmpty())
+            ItemStack[] contents = p.getInventory().getContents();
+        
+            if (contents.length == 0)
             {
                 p.sendMessage(ChatColor.RED + "Cannot create an empty kit");
                 return;
             }
             
-            ItemStack[] items = pinv.getContents();
+            
+            ItemStack[] items = new ItemStack[41];
+
+            ItemStack current;
+            for (int i = 0; i < items.length; i++)
+            {
+                current = contents[i];
+                if (current == null || current.getType().equals(Material.AIR)) continue;
+                items[i] = new ItemStack(current);
+            }
+
             Collection<PotionEffect> pf = p.getActivePotionEffects();
 
 
@@ -130,13 +141,13 @@ public class CommandFFAUtils extends BaseCommand
         }
 
         @Subcommand("spawn")
-        @CommandCompletion("name STANDARD|SPAWN")
+        @CommandCompletion("name " + SpawnLocation.SPAWN + "|" + SpawnLocation.STANDARD + "|" + SpawnLocation.EDITOR_ROOM + "|" + SpawnLocation.FTN)
         public void onCreateSpawn(Player p, String spawn_name, String type)
         {   
             if (sp.createSpawn(spawn_name.toUpperCase(), p.getLocation(), type.toLowerCase()))
                 p.sendMessage(ChatColor.AQUA + "Spawn " + spawn_name + " created");
             else
-                p.sendMessage(ChatColor.RED + "This spawn already exist");
+                p.sendMessage(ChatColor.RED + "Could not create spawn " + spawn_name);
         }
     }
 
@@ -214,7 +225,7 @@ public class CommandFFAUtils extends BaseCommand
                     if (sp.teleportEntityToSpawn(spawn_name.toUpperCase(), k))
                         p.sendMessage(ChatColor.AQUA + k.getName() + " teleported to " + spawn_name);
                     else
-                        p.sendMessage(ChatColor.RED + "Spawn " + spawn_name + " does not exist");
+                        p.sendMessage(ChatColor.RED + "Spawn " + spawn_name + " could not be used");
                 }
                 else p.sendMessage(ChatColor.RED + "Player not found");
             }
@@ -223,7 +234,7 @@ public class CommandFFAUtils extends BaseCommand
                 if (sp.teleportEntityToSpawn(spawn_name.toUpperCase(), (Player) p))
                     p.sendMessage(ChatColor.AQUA + "Teleported to " + spawn_name);
                 else
-                    p.sendMessage(ChatColor.RED + "Spawn " + spawn_name + " does not exist");
+                    p.sendMessage(ChatColor.RED + "Spawn " + spawn_name + " could not be used");
             } else p.sendMessage(ChatColor.RED + "Bad command syntax for non-player executor");
         }
     }
@@ -397,7 +408,40 @@ public class CommandFFAUtils extends BaseCommand
             ffaplayer = FFAPlayersManager.ffa_players.get(player_keys[i]);
             ffaplayer.setPlayerKit(null);
             ffaplayer.setPlayerSpawn(main_spawn);
-            fph.removePlayerFromFFA(ffaplayer.getPlayer());
+            fph.movePlayerFromFFA(ffaplayer);
+        }
+    }
+
+    @Subcommand("load")
+    public void onLoadPlayer(CommandSender s, String p, String kit, String spawn)
+    {
+        Player pj = Bukkit.getPlayer(p);
+        KitInterface k = KitManager.kits.get(kit.toUpperCase());
+        SpawnLocation sp = SpawnManager.spawns.get(spawn.toUpperCase());
+        if (pj != null && k != null && sp != null)
+        {
+            if (fph.isOnFFA(pj.getUniqueId()))
+                fph.removePlayerFromFFA(FFAPlayersManager.ffa_players.get(pj.getUniqueId()));
+            fph.addPlayerToFFA(pj, k, sp);
+        }
+    }
+
+    @Subcommand("unload")
+    public void onUnloadPlayer(CommandSender s, String p)
+    {
+        SpawnLocation main_spawn = sp.getMainSpawn();
+        if (sp.getMainSpawn() == null)
+        {
+            s.sendMessage(ChatColor.RED + "There is not a main spawn defined");
+            return;
+        }
+
+        FFAPlayer ffaplayer = FFAPlayersManager.ffa_players.get(Bukkit.getPlayer(p).getUniqueId());
+        if (ffaplayer != null)
+        {
+            ffaplayer.setPlayerKit(null);
+            ffaplayer.setPlayerSpawn(main_spawn);
+            fph.movePlayerFromFFA(ffaplayer);
         }
     }
 }

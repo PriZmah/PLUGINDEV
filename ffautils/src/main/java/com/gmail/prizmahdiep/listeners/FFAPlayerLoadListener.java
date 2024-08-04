@@ -8,6 +8,7 @@ import com.gmail.prizmahdiep.events.FFAPlayerLoadEvent;
 import com.gmail.prizmahdiep.managers.KitManager;
 import com.gmail.prizmahdiep.managers.SpawnManager;
 import com.gmail.prizmahdiep.objects.FFAPlayer;
+import com.gmail.prizmahdiep.utils.PlayerUtils;
 
 public class FFAPlayerLoadListener implements Listener
 {
@@ -25,8 +26,8 @@ public class FFAPlayerLoadListener implements Listener
     {
         FFAPlayer fp = event.getFFAPlayer();
         Player p = fp.getPlayer();
-        ku.setPlayerKit(fp.getPlayerKit().getName(), p);
-   
         su.teleportEntityToSpawn(fp.getChosenSpawn().getName(), p);
+        ku.setPlayerKit(fp.getPlayerKit().getName(), p);
+        PlayerUtils.resetPlayerStatus(p);
     }
 }

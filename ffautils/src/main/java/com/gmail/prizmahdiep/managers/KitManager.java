@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
-import com.gmail.prizmahdiep.FFAUtils;
 import com.gmail.prizmahdiep.database.KitDatabase;
 import com.gmail.prizmahdiep.objects.FFAPlayer;
 import com.gmail.prizmahdiep.objects.Kit;
@@ -18,12 +17,10 @@ import com.gmail.prizmahdiep.objects.KitInterface;
 public class KitManager
 {
     public static Map<String, KitInterface> kits;
-    private FFAUtils plugin;
     private KitDatabase kit_database;
 
-    public KitManager(FFAUtils pl, KitDatabase kdb) 
+    public KitManager(KitDatabase kdb) 
     {
-        this.plugin = pl;
         this.kit_database = kdb;
         kits = new HashMap<>();
         reloadKits();
@@ -31,11 +28,11 @@ public class KitManager
 
     public boolean createKit(String name, ItemStack[] inv, Collection<PotionEffect> pf, boolean restorable)
     {
-        Kit k = new Kit(name, inv, pf, restorable);
         try
         {
-            if (!kit_database.kitExists(k.getName()) && !kits.containsKey(name))
+            if (!kit_database.kitExists(name) && !kits.containsKey(name))
             {
+                Kit k = new Kit(name, inv, pf, restorable);
                 kit_database.addKit(k);
                 kits.put(name, k);
                 return true;
@@ -65,11 +62,8 @@ public class KitManager
 
     public boolean setPlayerKit(String k_name, Player p)
     {
-        if (!kits.containsKey(k_name))
-        {
-            plugin.getLogger().info("Kit " + k_name + " does not exists");
-            return false;
-        }
+        if (!kits.containsKey(k_name)) return false;
+        
         KitInterface k = kits.get(k_name);
         
         p.getInventory().setContents(k.getInventory());

@@ -16,6 +16,7 @@
 /home/prizmah/Escritorio/PLUGINDEV/ffautils/src/main/java/com/gmail/prizmahdiep/database/SpawnDatabase.java
 /home/prizmah/Escritorio/PLUGINDEV/ffautils/src/main/java/com/gmail/prizmahdiep/commands/CommandUnloadme.java
 /home/prizmah/Escritorio/PLUGINDEV/ffautils/src/main/java/com/gmail/prizmahdiep/objects/EditableKit.java
+/home/prizmah/Escritorio/PLUGINDEV/ffautils/src/main/java/com/gmail/prizmahdiep/utils/SpawnLocationUtil.java
 /home/prizmah/Escritorio/PLUGINDEV/ffautils/src/main/java/com/gmail/prizmahdiep/managers/KitManager.java
 /home/prizmah/Escritorio/PLUGINDEV/ffautils/src/main/java/com/gmail/prizmahdiep/events/FFAPlayerLoadEvent.java
 /home/prizmah/Escritorio/PLUGINDEV/ffautils/src/main/java/com/gmail/prizmahdiep/events/FFAPlayerUnloadEvent.java

@@ -1,6 +1,5 @@
 package com.gmail.prizmahdiep.commands;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import com.gmail.prizmahdiep.managers.FFAPlayersManager;
@@ -38,7 +37,6 @@ public class CommandLoadme extends BaseCommand
 
         if (ffap != null)
         {
-            Bukkit.getServer().getLogger().warning("Tried to load a loaded player");
             p.sendMessage(ChatColor.RED + "You are already in FFA");
             return;
         }
@@ -66,9 +64,11 @@ public class CommandLoadme extends BaseCommand
             p.sendMessage(ChatColor.RED + "You don't have permission to use this spawn");
             return;  
         }
-        if (!sa.getType().equals(SpawnLocation.SPAWN))
+
+        String satype = sa.getType();
+        if (!satype.equals(SpawnLocation.SPAWN) && !satype.equals(SpawnLocation.EDITOR_ROOM) && !satype.equals(SpawnLocation.FTN))
             fph.addPlayerToFFA(p, ka, sa);
         else
-        p.sendMessage(ChatColor.RED + "You can't load yourself to the main spawn");
+        p.sendMessage(ChatColor.RED + "This spawn is not eligible for arbitrary use");
     } 
 }

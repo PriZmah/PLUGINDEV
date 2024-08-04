@@ -10,6 +10,7 @@ import org.bukkit.entity.Entity;
 
 import com.gmail.prizmahdiep.database.SpawnDatabase;
 import com.gmail.prizmahdiep.objects.SpawnLocation;
+import com.gmail.prizmahdiep.utils.SpawnLocationUtil;
 
 public class SpawnManager
 {
@@ -35,6 +36,7 @@ public class SpawnManager
         try 
         {
             SpawnLocation loca = new SpawnLocation(name, loc, type);
+            if (!SpawnLocationUtil.isValidSpawn(loca)) return false;
             spawn_database.addSpawn(loca);
             spawns.put(name, loca);
         } catch (SQLException e) 
@@ -60,7 +62,12 @@ public class SpawnManager
     public boolean teleportEntityToSpawn(String name, Entity p)
     {
         if (!spawns.containsKey(name)) return false;
-        p.teleport(spawns.get(name).getLocation());
+        {
+            SpawnLocation l = spawns.get(name);
+            if (!SpawnLocationUtil.isValidSpawn(l)) return false;
+            p.teleport(spawns.get(name).getLocation());
+        }
+        
         return true;
     }
     
