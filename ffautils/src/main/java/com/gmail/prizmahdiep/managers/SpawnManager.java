@@ -85,7 +85,7 @@ public class SpawnManager
         return spawns.size();
     }
 
-    public SpawnLocation getMainSpawn()
+    public static SpawnLocation mainSpawn()
     {
         for (SpawnLocation i : spawns.values())
             if (i.getType().equals(SpawnLocation.SPAWN))

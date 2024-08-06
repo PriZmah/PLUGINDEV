@@ -8,21 +8,17 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.gmail.prizmahdiep.FFAUtils;
 import com.gmail.prizmahdiep.managers.FFAPlayersManager;
-import com.gmail.prizmahdiep.managers.SpawnManager;
 import com.gmail.prizmahdiep.objects.FFAPlayer;
+import com.gmail.prizmahdiep.utils.PlayerUtils;
 
 
 public class PlayerRespawnListener implements Listener
 {
-    private FFAPlayersManager fph;
     private FFAUtils futils;
-    private SpawnManager sm;
 
-    public PlayerRespawnListener(FFAPlayersManager fph, FFAUtils pl, SpawnManager sm) 
+    public PlayerRespawnListener(FFAUtils pl) 
     {
-        this.fph = fph;
         this.futils = pl;
-        this.sm = sm;
     }
 
     @EventHandler
@@ -42,9 +38,6 @@ public class PlayerRespawnListener implements Listener
     private void resetPlayer(Player p) 
     {
         FFAPlayer pj = FFAPlayersManager.ffa_players.get(p.getUniqueId());
-        pj.setPlayerKit(null);
-        pj.setPlayerSpawn(sm.getMainSpawn());
-        
-        fph.movePlayerFromFFA(pj);
+        PlayerUtils.resetFFAPlayer(pj);
     }
 }

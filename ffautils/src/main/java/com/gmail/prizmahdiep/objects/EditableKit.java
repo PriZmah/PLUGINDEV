@@ -6,49 +6,20 @@ import java.util.UUID;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
-public class EditableKit implements KitInterface
+public class EditableKit
 {
     private UUID owner;
-    private String name;
-    private ItemStack[] inventory;
-    private Collection<PotionEffect> effects;
-    private boolean restorable;
+    private ItemStack[] armor;
+    private ItemStack[] storage;
+    public static String A
 
-    public EditableKit(String name, ItemStack[] inventory_contents, Collection<PotionEffect> effects, boolean restorable, UUID owner) 
+    public EditableKit(String name, String editable_part, Collection<PotionEffect> effects, boolean restorable, UUID owner) 
     {
-        this.name = name;
-        this.inventory = inventory_contents;
-        this.effects = effects;
-        this.owner = owner;
-        this.restorable = restorable;
+        
     }
 
     public UUID getOwner()
     {
         return owner;
-    }
-
-    @Override
-    public ItemStack[] getInventory() 
-    {
-        return this.inventory;
-    }
-
-    @Override
-    public Collection<PotionEffect> getPotionEffects() 
-    {
-        return this.effects;
-    }
-
-    @Override
-    public String getName() 
-    {
-        return this.name;
-    }
-
-    @Override
-    public boolean isRestorable()
-    {
-        return this.restorable;
     }
 }

@@ -7,6 +7,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 
 import com.gmail.prizmahdiep.managers.FFAPlayersManager;
 import com.gmail.prizmahdiep.managers.SpawnManager;
+import com.gmail.prizmahdiep.utils.PlayerUtils;
 
 public class PlayerJoinListener implements Listener 
 {
@@ -25,10 +26,19 @@ public class PlayerJoinListener implements Listener
         teleportToMainSpawn(event.getPlayer());
     }
 
-    private void teleportToMainSpawn(Player player) 
+    private void teleportToMainSpawn(Player p) 
     {
-        if (sup.getMainSpawn() == null || !fph.isOnFFA(player.getUniqueId())) return;
-        sup.teleportEntityToSpawn(sup.getMainSpawn().getName(), player);
+        if (!(fph.isOnFFA(p.getUniqueId()) || fph.isIdle(p.getUniqueId())))
+        {
+            if (!p.hasPermission("ffautils.admin"))
+            {
+                PlayerUtils.resetPlayerStatus(p);
+                sup.teleportEntityToSpawn(SpawnManager.mainSpawn().getName(), p);
+                p.getInventory().clear();
+                p.clearActivePotionEffects();
+            }
+            return;
+        }
     }
 
 

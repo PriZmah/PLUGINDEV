@@ -18,19 +18,17 @@ import net.md_5.bungee.api.ChatColor;
 public class CommandUnloadme extends BaseCommand
 {
     private FFAPlayersManager fph;
-    private SpawnManager sputils;
 
-    public CommandUnloadme(FFAPlayersManager fph, SpawnManager sputils)
+    public CommandUnloadme(FFAPlayersManager fph)
     {
         this.fph = fph;
-        this.sputils = sputils;
     }
 
     @Default
     public void onUnloadme(Player p)
     {
         FFAPlayer ffap = FFAPlayersManager.ffa_players.get(p.getUniqueId());
-        SpawnLocation main_spawn = sputils.getMainSpawn();
+        SpawnLocation main_spawn = SpawnManager.mainSpawn();
         
         if (ffap == null)
         {

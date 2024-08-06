@@ -19,6 +19,6 @@ public class CommandHandler
     {
         manager.registerCommand(new CommandFFAUtils(sp, ku, fph));
         manager.registerCommand(new CommandLoadme(fph));
-        manager.registerCommand(new CommandUnloadme(fph, sp));
+        manager.registerCommand(new CommandUnloadme(fph));
     }
 }

@@ -392,8 +392,8 @@ public class CommandFFAUtils extends BaseCommand
     @Subcommand("unloadall")
     public void onUnloadall(CommandSender s)
     {
-        SpawnLocation main_spawn = sp.getMainSpawn();
-        if (sp.getMainSpawn() == null)
+        SpawnLocation main_spawn = SpawnManager.mainSpawn();
+        if (SpawnManager.mainSpawn() == null)
         {
             s.sendMessage(ChatColor.RED + "There is not a main spawn defined");
             return;
@@ -429,8 +429,8 @@ public class CommandFFAUtils extends BaseCommand
     @Subcommand("unload")
     public void onUnloadPlayer(CommandSender s, String p)
     {
-        SpawnLocation main_spawn = sp.getMainSpawn();
-        if (sp.getMainSpawn() == null)
+        SpawnLocation main_spawn = SpawnManager.mainSpawn();
+        if (SpawnManager.mainSpawn() == null)
         {
             s.sendMessage(ChatColor.RED + "There is not a main spawn defined");
             return;

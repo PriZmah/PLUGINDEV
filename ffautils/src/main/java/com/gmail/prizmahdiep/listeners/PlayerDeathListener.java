@@ -46,23 +46,24 @@ public class PlayerDeathListener implements Listener
         double current_health = 0;
         double needed_health = 0;
 
-        if (fph.isOnFFA(victim.getUniqueId()))
+        if (fph.isOnFFA(killer.getUniqueId()))
+            max_health = killer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+            current_health = killer.getHealth();
+            needed_health = max_health - current_health;
+            killer.setHealth(current_health + needed_health);
+            killer.sendActionBar(Component.text(ChatColor.GREEN + "Healed " + (double) Math.round(needed_health * 100) / 100 + " HP"));
             
-            if (fph.isOnFFA((killer.getUniqueId())))
+            ev.deathMessage(Component.text(ChatColor.RED + "☠ " + victim.getName() + ChatColor.GRAY + " fue asesinado por " 
+            + ChatColor.GREEN + killer.getName() + ChatColor.GRAY + " con " + ChatColor.WHITE + String.valueOf((double) Math.round(current_health * 100) / 100) + 
+            ChatColor.YELLOW + " ❤"));
+            
+            FFAPlayer fp = FFAPlayersManager.ffa_players.get(killer.getUniqueId());
+            if (fp.getPlayerKit().isRestorable())
+                km.restorePlayerKit(fp);
+
+            // &c☠ %{_victim}% &7fue asesinado por &a%{_attacker}% &7con &f%{_attackerHealth}% &e❤"
+            /*if (fph.isOnFFA((killer.getUniqueId())))
             {
-                max_health = killer.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
-                current_health = killer.getHealth();
-                needed_health = max_health - current_health;
-                killer.setHealth(current_health + needed_health);
-                killer.sendActionBar(Component.text(ChatColor.GREEN + "Healed " + (double) Math.round(needed_health * 100) / 100 + " HP"));
-                
-                if (fph.isOnFFA(victim.getUniqueId()))
-                    ev.deathMessage(Component.text(ChatColor.RED + victim.getName() + ChatColor.YELLOW + " was slain by " 
-                    + ChatColor.GREEN + killer.getName() + ChatColor.YELLOW + " with " + String.valueOf((double) Math.round(current_health * 100) / 100) + " HP"));
-                
-                FFAPlayer fp = FFAPlayersManager.ffa_players.get(killer.getUniqueId());
-                if (fp.getPlayerKit().isRestorable())
-                    km.restorePlayerKit(fp);
-            }
+            }*/
     }
 }
