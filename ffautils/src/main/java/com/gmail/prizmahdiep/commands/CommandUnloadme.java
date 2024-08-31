@@ -18,17 +18,19 @@ import net.md_5.bungee.api.ChatColor;
 public class CommandUnloadme extends BaseCommand
 {
     private FFAPlayersManager fph;
+    private SpawnManager sm;
 
-    public CommandUnloadme(FFAPlayersManager fph)
+    public CommandUnloadme(FFAPlayersManager fph, SpawnManager sm)
     {
+        this.sm = sm;
         this.fph = fph;
     }
 
     @Default
     public void onUnloadme(Player p)
     {
-        FFAPlayer ffap = FFAPlayersManager.ffa_players.get(p.getUniqueId());
-        SpawnLocation main_spawn = SpawnManager.mainSpawn();
+        FFAPlayer ffap = fph.getFFAPlayers().get(p.getUniqueId());
+        SpawnLocation main_spawn = sm.getSpawnOfType(SpawnLocation.SPAWN);
         
         if (ffap == null)
         {
@@ -36,14 +38,11 @@ public class CommandUnloadme extends BaseCommand
             return;
         }
         
-        ffap.setPlayerKit(null);
-        
-        if (main_spawn != null)
+        if (main_spawn == null)
         {
-            ffap.setPlayerSpawn(main_spawn);
+            p.sendMessage(ChatColor.RED + "Main spawn does not exist");
+            return;
         }
-        else p.sendMessage(ChatColor.RED + "Main spawn does not exist");
-
 
         fph.movePlayerFromFFA(ffap);
     }

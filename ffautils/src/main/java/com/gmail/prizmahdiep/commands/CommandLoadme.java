@@ -5,8 +5,7 @@ import org.bukkit.entity.Player;
 import com.gmail.prizmahdiep.managers.FFAPlayersManager;
 import com.gmail.prizmahdiep.managers.KitManager;
 import com.gmail.prizmahdiep.managers.SpawnManager;
-import com.gmail.prizmahdiep.objects.FFAPlayer;
-import com.gmail.prizmahdiep.objects.KitInterface;
+import com.gmail.prizmahdiep.objects.Kit;
 import com.gmail.prizmahdiep.objects.SpawnLocation;
 
 import co.aikar.commands.BaseCommand;
@@ -21,21 +20,24 @@ import net.md_5.bungee.api.ChatColor;
 public class CommandLoadme extends BaseCommand
 {
     private FFAPlayersManager fph;
+    private KitManager km;
+    private SpawnManager sm;
 
-    public CommandLoadme(FFAPlayersManager fph)
+    public CommandLoadme(FFAPlayersManager fph, KitManager km, SpawnManager sm)
     {
         this.fph = fph;
+        this.km = km;
+        this.sm = sm;
     }
 
     @Default
     @CommandCompletion("kit_name spawn_name")
     public void onLoadMe(Player p, String kit, String spawn)
     {
-        SpawnLocation sa = SpawnManager.spawns.get(spawn.toUpperCase());
-        KitInterface ka = KitManager.kits.get(kit.toUpperCase());
-        FFAPlayer ffap = FFAPlayersManager.ffa_players.get(p.getUniqueId());
+        SpawnLocation sa = sm.getSpawns().get(spawn.toUpperCase());
+        Kit ka = km.getKits().get(kit.toUpperCase());
 
-        if (ffap != null)
+        if (fph.isOnFFA(p.getUniqueId()))
         {
             p.sendMessage(ChatColor.RED + "You are already in FFA");
             return;
@@ -69,6 +71,6 @@ public class CommandLoadme extends BaseCommand
         if (!satype.equals(SpawnLocation.SPAWN) && !satype.equals(SpawnLocation.EDITOR_ROOM) && !satype.equals(SpawnLocation.FTN))
             fph.addPlayerToFFA(p, ka, sa);
         else
-        p.sendMessage(ChatColor.RED + "This spawn is not eligible for arbitrary use");
+            p.sendMessage(ChatColor.RED + "This spawn is not eligible for arbitrary use");
     } 
 }

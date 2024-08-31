@@ -10,13 +10,13 @@ import org.bukkit.entity.Player;
 import com.gmail.prizmahdiep.events.FFAPlayerLoadEvent;
 import com.gmail.prizmahdiep.events.FFAPlayerUnloadEvent;
 import com.gmail.prizmahdiep.objects.FFAPlayer;
-import com.gmail.prizmahdiep.objects.KitInterface;
+import com.gmail.prizmahdiep.objects.Kit;
 import com.gmail.prizmahdiep.objects.SpawnLocation;
 
 public class FFAPlayersManager 
 {
-    public static Map<UUID, FFAPlayer> ffa_players;
-    public static Map<UUID, FFAPlayer> idle_ffa_players;
+    private Map<UUID, FFAPlayer> ffa_players;
+    private Map<UUID, FFAPlayer> idle_ffa_players;
 
     public FFAPlayersManager()
     {
@@ -34,12 +34,23 @@ public class FFAPlayersManager
         return idle_ffa_players.containsKey(p);
     }
 
-    public boolean addPlayerToFFA(Player p, KitInterface k, SpawnLocation s)
+    public boolean addPlayerToFFA(Player p, Kit k, SpawnLocation s)
     {  
         UUID piud = p.getUniqueId();
         if (isOnFFA(piud)) return false;
+        removePlayerFromIdle(piud);
         
-        FFAPlayer pf = new FFAPlayer(p, k, s);
+        FFAPlayer pf = idle_ffa_players.get(piud);
+        if (pf == null)
+            pf = new FFAPlayer(p, k.getName(), s.getName());
+        else
+        {
+            pf.setLastPlayerKitName(pf.getCurrentPlayerKitName());
+            pf.setCurrentPlayerKitName(k.getName());
+            pf.setLastSpawnName(pf.getLastSpawnName());
+            pf.setCurrentSpawnName(s.getName());
+            movePlayerFromIdle(pf);
+        }
         ffa_players.put(p.getUniqueId(), pf);
 
         Bukkit.getServer().getPluginManager().callEvent(new FFAPlayerLoadEvent(pf));
@@ -54,15 +65,13 @@ public class FFAPlayersManager
         return true;
     }
 
-    public boolean movePlayerFromIdle(FFAPlayer p)
+    private boolean movePlayerFromIdle(FFAPlayer p)
     {
         UUID piud = p.getUUID();
         if (!isIdle(piud)) return false;
-        p.setPlayerKit(p.getLastPlayerKit());
-        p.setPlayerSpawn(p.getLastChosenSpawn());
 
         ffa_players.put(piud, p);
-        removePlayerFromIdle(p);
+        removePlayerFromIdle(piud);
         Bukkit.getServer().getPluginManager().callEvent(new FFAPlayerLoadEvent(p));
         return true;
     }
@@ -79,10 +88,19 @@ public class FFAPlayersManager
         return true;
     }
 
-    public void removePlayerFromIdle(FFAPlayer p) 
+    public void removePlayerFromIdle(UUID p) 
     {
-        UUID piud = p.getUUID();
-        if (isIdle(piud))
-            idle_ffa_players.remove(piud);
+        if (isIdle(p))
+            idle_ffa_players.remove(p);
+    }
+
+    public Map<UUID, FFAPlayer> getFFAPlayers()
+    {
+        return this.ffa_players;
+    }
+
+    public Map<UUID, FFAPlayer> getIdleFFAPlayers()
+    {
+        return this.idle_ffa_players;
     }
 }

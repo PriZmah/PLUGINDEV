@@ -1,8 +1,0 @@
-name: GoldenHeadDetector300
-main: com.gmail.prizmahdiep.QuitadorDeSaturacion3000
-version: 99.0
-api-version: '1.20'
-description: Quita la jodida saturación
-author: EL BOCHES
-depends: ["ConsumeFood"]
-    

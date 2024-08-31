@@ -1,96 +1,134 @@
 package com.gmail.prizmahdiep.managers;
 
-import java.util.Map;
-import java.util.Set;
-import java.sql.SQLException;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
+import org.apache.commons.io.FilenameUtils;
 import org.bukkit.Location;
-import org.bukkit.entity.Entity;
 
-import com.gmail.prizmahdiep.database.SpawnDatabase;
+import com.gmail.prizmahdiep.objects.SerializableSpawnLocation;
 import com.gmail.prizmahdiep.objects.SpawnLocation;
-import com.gmail.prizmahdiep.utils.SpawnLocationUtil;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonIOException;
 
-public class SpawnManager
+public class SpawnManager 
 {
-    public static Map<String, SpawnLocation> spawns;
-    private SpawnDatabase spawn_database;
-    
-    public SpawnManager(SpawnDatabase spawn_database)
+    private Map<String, SpawnLocation> spawns;
+    private File spawns_folder;
+    private Gson gson;
+
+    public SpawnManager(File spawns_folder) throws IOException
     {
-        this.spawn_database = spawn_database;
-        spawns = new HashMap<>();
-        reloadSpawns();
-    }
-    
-    
-    public Set<String> getExistingSpawns()
-    {
-        return spawns.keySet();
+        this.spawns_folder = spawns_folder;
+        if (!spawns_folder.isDirectory()) throw new IOException("File is not a directory");
+        this.gson = new GsonBuilder().setPrettyPrinting().create();
+        this.spawns = getSpawnsFromFiles();
     }
 
-    public boolean createSpawn(String name, Location loc, String type)
+    public boolean createSpawn(String name, String type, Location location)
     {
-        if (spawns.containsKey(name)) return false;
-        try 
+        SpawnLocation sa = new SpawnLocation("", location, type);
+        if (!isValidSpawn(sa)) return false;
+        
+        SerializableSpawnLocation spawn_serialized = new SerializableSpawnLocation(sa);
+        if (getSpawnFile(name) == null)
         {
-            SpawnLocation loca = new SpawnLocation(name, loc, type);
-            if (!SpawnLocationUtil.isValidSpawn(loca)) return false;
-            spawn_database.addSpawn(loca);
-            spawns.put(name, loca);
-        } catch (SQLException e) 
-        {
-            e.printStackTrace();
+            File spawn_file = new File(spawns_folder, name.toLowerCase() + ".json");
+            try (FileWriter fw = new FileWriter(spawn_file))
+            {
+                spawn_file.createNewFile();
+                gson.toJson(spawn_serialized, fw);
+                spawns.put(name, spawn_serialized.getSpawn(name));
+            }
+            catch (IOException | JsonIOException e)
+            {
+                e.printStackTrace();
+            }
         }
+        else if (spawns.containsKey(name)) return false;
+        else spawns.put(name, spawn_serialized.getSpawn(name));
         return true;
     }
 
     public boolean removeSpawn(String name)
     {
+        File df = getSpawnFile(name);
         if (spawns.containsKey(name)) spawns.remove(name);
-        try 
-        {
-            spawn_database.removeSpawn(name);
-        } catch (SQLException e) 
-        {
-            e.printStackTrace();
-        }
-        return true;
+        if (df != null) return df.delete();
+        return false;
     }
 
-    public boolean teleportEntityToSpawn(String name, Entity p)
+    private Map<String, SpawnLocation> getSpawnsFromFiles() 
     {
-        if (!spawns.containsKey(name)) return false;
-        {
-            SpawnLocation l = spawns.get(name);
-            if (!SpawnLocationUtil.isValidSpawn(l)) return false;
-            p.teleport(spawns.get(name).getLocation());
-        }
+        Map<String, SpawnLocation> spawns = new HashMap<>();
+        File[] spawn_files = spawns_folder.listFiles();
         
-        return true;
+        for (File spawn_file : spawn_files)
+            if (spawn_file.isFile() && spawn_file.getName().endsWith(".json"))
+                try (BufferedReader br = new BufferedReader(new FileReader(spawn_file)))
+                {
+                    String name = FilenameUtils.removeExtension(spawn_file.getName()).toUpperCase();
+                    StringBuilder json = new StringBuilder();
+                    String line;
+
+                    while ((line = br.readLine()) != null) json.append(line);
+                    
+                    spawns.put(name, gson.fromJson(json.toString(), SerializableSpawnLocation.class).getSpawn(name));
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+
+        return spawns;
     }
-    
-    public int reloadSpawns() 
+
+    private File getSpawnFile(String name) 
     {
-        try 
-        {
-            spawns.clear();
-            spawns.putAll(spawn_database.getSpawns());
-        } catch (SQLException e) 
-        {
-            e.printStackTrace();
-        }
-    
+        File[] files = spawns_folder.listFiles();
+        for (File i : files)
+            if (i.isFile())
+                if (name.equalsIgnoreCase(FilenameUtils.removeExtension(i.getName()))) return i;
+        return null;
+    }
+
+    public Map<String, SpawnLocation> getSpawns()
+    {
+        return this.spawns;
+    }
+
+    public int reloadSpawns()
+    {
+        spawns.clear();
+        spawns = getSpawnsFromFiles();
         return spawns.size();
     }
 
-    public static SpawnLocation mainSpawn()
+    public SpawnLocation getSpawnOfType(String type)
     {
         for (SpawnLocation i : spawns.values())
-            if (i.getType().equals(SpawnLocation.SPAWN))
-                return i;
+            if (i.getType().equals(type)) return i;
         
         return null;
+    }
+
+    public boolean isValidSpawn(SpawnLocation spawn)
+    {
+        if (spawn == null) return false;
+        if (spawn.getLocation().getWorld() == null) return false;
+        String spawntype = spawn.getType();
+        if (!spawntype.equals(SpawnLocation.EDITOR_ROOM) && !spawntype.equals(SpawnLocation.FTN)
+        && !spawntype.equals(SpawnLocation.SPAWN) && !spawntype.equals(SpawnLocation.STANDARD)) return false;
+
+        for (SpawnLocation i : spawns.values())
+            if (spawn.getType().equals(i.getType()) && i.getType().equals(SpawnLocation.SPAWN)
+                && !spawn.equals(i)) return false;
+        return true;
     }
 }

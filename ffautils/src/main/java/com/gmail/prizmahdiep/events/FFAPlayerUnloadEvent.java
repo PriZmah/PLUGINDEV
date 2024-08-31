@@ -13,11 +13,7 @@ public class FFAPlayerUnloadEvent extends Event implements Cancellable
     private FFAPlayer p;
     private static final HandlerList HANDLERS = new HandlerList();
 
-    public static HandlerList getHandlerList() 
-    {
-        return HANDLERS;
-    }
-
+    
     public FFAPlayerUnloadEvent(FFAPlayer p) 
     {
         this.isCancelled = false;
@@ -34,7 +30,7 @@ public class FFAPlayerUnloadEvent extends Event implements Cancellable
     public boolean isCancelled() {
         return this.isCancelled;
     }
-
+    
     @Override
     public void setCancelled(boolean isCancelled) {
         this.isCancelled = isCancelled;
@@ -43,5 +39,9 @@ public class FFAPlayerUnloadEvent extends Event implements Cancellable
     public FFAPlayer getFFAPlayer()
     {
         return this.p;
+    }
+
+    public static HandlerList getHandlerList() {
+        return HANDLERS;
     }
 }

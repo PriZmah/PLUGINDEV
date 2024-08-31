@@ -14,10 +14,7 @@ public class FFAPlayerLoadEvent extends Event implements Cancellable
 
     private static final HandlerList HANDLERS = new HandlerList();
 
-    public static HandlerList getHandlerList() {
-        return HANDLERS;
-    }
-
+    
     public FFAPlayerLoadEvent(FFAPlayer a) 
     {
         this.isCancelled = false;
@@ -43,5 +40,9 @@ public class FFAPlayerLoadEvent extends Event implements Cancellable
     public FFAPlayer getFFAPlayer()
     {
         return this.ffpl;
+    }
+
+    public static HandlerList getHandlerList() {
+        return HANDLERS;
     }
 }

@@ -2,22 +2,20 @@ package com.gmail.prizmahdiep.objects;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
 import java.util.UUID;
 
 public class FFAPlayer
 {
     private final UUID player_uuid;
-    private KitInterface player_kit, last_player_kit;
-    private SpawnLocation chosen_spawn, last_chosen_spawn;
+    private String player_kit, last_player_kit, chosen_spawn, last_chosen_spawn;
 
-    public FFAPlayer(Player p, KitInterface pk, SpawnLocation spawn)
+    public FFAPlayer(Player p, String kit, String spawn)
     {
         this.player_uuid = p.getUniqueId();
-        if (pk == null) player_kit = new Kit("empty", new ItemStack[0], new ArrayList<>(0), false);
-        else this.player_kit = pk;
+        this.last_player_kit = "none";
+        this.player_kit = kit;
+        this.last_chosen_spawn = "none";
         this.chosen_spawn = spawn;
     }
 
@@ -26,22 +24,22 @@ public class FFAPlayer
         return Bukkit.getPlayer(player_uuid);
     }
 
-    public KitInterface getPlayerKit()
+    public String getCurrentPlayerKitName()
     {
         return this.player_kit;
     }
 
-    public KitInterface getLastPlayerKit()
+    public String getLastPlayerKitName()
     {
         return this.last_player_kit;
     }
     
-    public SpawnLocation getChosenSpawn()
+    public String getCurrentSpawnName()
     {
         return this.chosen_spawn;
     }
 
-    public SpawnLocation getLastChosenSpawn()
+    public String getLastSpawnName()
     {
         return this.last_chosen_spawn;
     }
@@ -51,20 +49,23 @@ public class FFAPlayer
         return this.player_uuid;
     }
 
-    public void setPlayerKit(KitInterface pk)
+    public void setCurrentPlayerKitName(String pk)
     {
-        this.last_player_kit = this.player_kit;
-        if (pk == null)
-        {
-            Kit empty = new Kit("empty", new ItemStack[0], new ArrayList<>(0), false);
-            this.player_kit = empty;
-        }
-        else this.player_kit = pk;
+        this.player_kit = pk;
     }
 
-    public void setPlayerSpawn(SpawnLocation s)
+    public void setCurrentSpawnName(String s)
     {
-        this.last_chosen_spawn = this.chosen_spawn;
         this.chosen_spawn = s;
+    }
+
+    public void setLastPlayerKitName(String pk)
+    {
+        this.last_player_kit = pk;
+    }
+
+    public void setLastSpawnName(String s)
+    {
+        this.last_chosen_spawn = s;
     }
 }

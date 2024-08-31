@@ -3,17 +3,25 @@ package com.gmail.prizmahdiep.utils;
 import org.bukkit.entity.Player;
 
 import com.gmail.prizmahdiep.managers.FFAPlayersManager;
+import com.gmail.prizmahdiep.managers.KitManager;
 import com.gmail.prizmahdiep.managers.SpawnManager;
 import com.gmail.prizmahdiep.objects.FFAPlayer;
+import com.gmail.prizmahdiep.objects.Kit;
 import com.gmail.prizmahdiep.objects.SpawnLocation;
+
+import net.md_5.bungee.api.ChatColor;
 
 public class PlayerUtils 
 {
     private static FFAPlayersManager fph;
+    private static SpawnManager sm;
+    private static KitManager km;
 
-    public PlayerUtils (FFAPlayersManager fpa)
+    public PlayerUtils (FFAPlayersManager fpa, SpawnManager sma, KitManager kma)
     {
         fph = fpa;
+        sm = sma;
+        km = kma;
     }
 
     public static void resetPlayerStatus(Player p)
@@ -25,8 +33,8 @@ public class PlayerUtils
 
     public static void resetPlayer(Player p)
     {
-        SpawnLocation a = SpawnManager.mainSpawn();
-        if (SpawnLocationUtil.isValidSpawn(a))
+        SpawnLocation a = sm.getSpawnOfType(SpawnLocation.SPAWN);
+        if (sm.isValidSpawn(a))
             p.teleport(a.getLocation());
         p.getInventory().clear();
         p.clearActivePotionEffects();
@@ -35,8 +43,6 @@ public class PlayerUtils
 
     public static void resetFFAPlayer(FFAPlayer p)
     {
-        p.setPlayerSpawn(SpawnManager.mainSpawn());
-        p.setPlayerKit(null);
         resetPlayerStatus(p.getPlayer());
         fph.movePlayerFromFFA(p);
     }
@@ -44,6 +50,29 @@ public class PlayerUtils
     public static void clearFFAPlayer(FFAPlayer p)
     {
         resetFFAPlayer(p);
-        fph.removePlayerFromIdle(p);
+        fph.removePlayerFromIdle(p.getUUID());
+    }
+
+    public static void setPlayerKit(Player p, Kit k)
+    {
+        p.clearActivePotionEffects();
+        p.addPotionEffects(k.getPotionEffects());
+        p.getInventory().setContents(k.getInventory());
+    }
+
+    public static void restorePlayerKit(FFAPlayer fp) 
+    {
+        Player p = fp.getPlayer();
+        Kit k = km.getKits().get(fp.getCurrentPlayerKitName());
+        if (k != null)
+            setPlayerKit(p, k);
+        else fp.getPlayer().sendMessage(ChatColor.RED + "This kit does not exist");
+    }
+
+    public static boolean teleportPlayerToSpawn(Player p, SpawnLocation s)
+    {
+        boolean flag = false;
+            if (flag = sm.isValidSpawn(s)) p.teleport(s.getLocation());
+        return flag;
     }
 }
