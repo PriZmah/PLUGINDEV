@@ -11,12 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 
 import com.gmail.prizmahdiep.utils.KitBase64Util;
-
-import net.kyori.adventure.text.Component;
 
 public class EditedKitsDatabase 
 {
@@ -126,7 +123,6 @@ public class EditedKitsDatabase
             if (result_set.next())
             {
                 String storage_base64 = result_set.getString("contents");
-                Bukkit.broadcast(Component.text(storage_base64));
                 return KitBase64Util.itemStackArrayFromBase64(storage_base64);
             }
         }
@@ -137,22 +133,21 @@ public class EditedKitsDatabase
         return null;
     }
 
-    public List<ItemStack[]> getPlayerEditedKits(UUID p) throws SQLException
+    public List<String> getPlayerEditedKitNames(UUID p) throws SQLException
     {
-        List<ItemStack[]> a = new ArrayList<>();
-        try (PreparedStatement preparedStatement = con.prepareStatement("SELECT contents FROM edited_kits WHERE owner = ?"))
+        List<String> a = new ArrayList<>();
+        try (PreparedStatement preparedStatement = con.prepareStatement("SELECT name FROM edited_kits WHERE owner = ?"))
         {
             preparedStatement.setString(1, p.toString());
             ResultSet result_set = preparedStatement.executeQuery();
 
             while(result_set.next())
             {
-                String storage_base64 = result_set.getString("contents");
-
-                a.add(KitBase64Util.itemStackArrayFromBase64(storage_base64));
+                String name = result_set.getString("name");
+                a.add(name);
             }
         }
-        catch (IOException | SQLException e)
+        catch (SQLException e)
         {
             e.printStackTrace();
         }
@@ -167,6 +162,33 @@ public class EditedKitsDatabase
             ps.executeUpdate();
         } 
         catch (SQLException e) 
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public void removeAllEditedKits(UUID p) throws SQLException
+    {
+        try (PreparedStatement ps = con.prepareStatement("DELETE FROM edited_kits WHERE owner = ?"))
+        {
+            ps.setString(1, p.toString());
+            ps.executeUpdate();
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public void removeAllEditedKits(UUID p, String kit_name) throws SQLException
+    {
+        try (PreparedStatement ps = con.prepareStatement("DELETE FROM edited_kits WHERE owner = ? AND name = ?"))
+        {
+            ps.setString(1, p.toString());
+            ps.setString(2, kit_name);
+            ps.executeUpdate();
+        }
+        catch (SQLException e)
         {
             e.printStackTrace();
         }

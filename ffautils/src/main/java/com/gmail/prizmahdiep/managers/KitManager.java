@@ -32,22 +32,36 @@ public class KitManager
     {
         this.kits_folder = kits_folder;
         if (!kits_folder.isDirectory()) throw new IOException("File is not a directory");
-        this.gson = new GsonBuilder().setPrettyPrinting().create();
+        this.gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
         this.kits = getKitsFromFiles();
     }
 
-    public boolean createKit(String name, PlayerInventory inv, Collection<PotionEffect> pf, boolean restorable, boolean editable)
+    public boolean createKit(String name, PlayerInventory inv, Collection<PotionEffect> pf, boolean restorable, boolean editable, String display_name)
     {
         SerializableKit new_kit_serialized;
-        ItemStack[] items = new ItemStack[41];
         ItemStack[] contents = inv.getContents();
+        ItemStack[] armor_contents = inv.getArmorContents();
+        ItemStack[] items = new ItemStack[41];
+        ItemStack[] armor_items = new ItemStack[4];
+        ItemStack main_hand = new ItemStack(inv.getItemInMainHand());
+        ItemStack off_hand = new ItemStack(inv.getItemInOffHand());
+        
+        for (int i = 0; i < armor_contents.length; i++)
+        {
+            if (armor_contents[i] == null || armor_contents[i].getType().equals(Material.AIR)) continue;
+            armor_items[i] = new ItemStack(armor_contents[i]);
+        }
+
+
         for (int i = 0; i < items.length; i++)
         {
             if (contents[i] == null || contents[i].getType().equals(Material.AIR)) continue;
             items[i] = new ItemStack(contents[i]);
         }
 
-        new_kit_serialized = new SerializableKit(new Kit("", items, pf, restorable, editable));
+        new_kit_serialized = new SerializableKit(
+            new Kit("", items, armor_contents, main_hand, off_hand, pf, restorable, editable, display_name)
+        );
 
         if (getKitFile(name) == null)
         {

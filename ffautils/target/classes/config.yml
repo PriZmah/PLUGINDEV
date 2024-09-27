@@ -1,5 +1,5 @@
-choose-random-death-message: true
-reset-player-status-on-kill: true
 fast-respawn: true
 fast-respawn-item-type: PINK_DYE
-override-vanilla-commands: true
+fast-respawn-item-name: "Damn"
+fast-respawn-item-lore: "That is pretty good"
+

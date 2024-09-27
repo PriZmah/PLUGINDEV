@@ -1,6 +1,7 @@
 package com.gmail.prizmahdiep.objects;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 
 public class SpawnLocation 
 {
@@ -11,18 +12,32 @@ public class SpawnLocation
 
     private final String name;
     private final Location location;
-    private String type;
+    private String type, lore, display_name;
+    private Material spawn_thumbnail;
 
-    public SpawnLocation(String name, Location location, String type)
+    public SpawnLocation(String name, Location location, String type, String dsn, String lore, Material tmb)
     {
         this.name = name;
+        this.display_name = dsn;
+        this.lore = lore;
         this.location = location;
         this.type = type;
+        this.spawn_thumbnail = tmb;
     }
 
     public String getName()
     {
         return this.name;
+    }
+
+    public String getDisplayName()
+    {
+        return this.display_name;
+    }
+
+    public String getLore()
+    {
+        return this.lore;
     }
 
     public Location getLocation()
@@ -43,5 +58,10 @@ public class SpawnLocation
     public boolean equals(SpawnLocation other)
     {
         return this.name.equals(other.getName());
+    }
+
+    public Material getThumbnail()
+    {
+        return this.spawn_thumbnail;
     }
 }

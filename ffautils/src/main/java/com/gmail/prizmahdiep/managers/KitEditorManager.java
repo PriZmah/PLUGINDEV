@@ -1,7 +1,9 @@
 package com.gmail.prizmahdiep.managers;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -11,21 +13,33 @@ import org.bukkit.inventory.ItemStack;
 import com.gmail.prizmahdiep.database.EditedKitsDatabase;
 import com.gmail.prizmahdiep.events.KitEditorPlayerLoadEvent;
 import com.gmail.prizmahdiep.events.KitEditorPlayerUnloadEvent;
+import com.gmail.prizmahdiep.objects.FFAPlayer;
 import com.gmail.prizmahdiep.objects.Kit;
+import com.gmail.prizmahdiep.utils.PlayerUtils;
 
 public class KitEditorManager 
 {
     private Map<UUID, Kit> kit_editor_players;
+    private Map<UUID, FFAPlayer> idle_players;
     private EditedKitsDatabase ekdb;
+    private FFAPlayersManager fph;
 
-    public KitEditorManager(EditedKitsDatabase ekdb)
+    public KitEditorManager(EditedKitsDatabase ekdb, FFAPlayersManager fph)
     {
         this.ekdb = ekdb;
         kit_editor_players = new HashMap<>();
+        idle_players = new HashMap<>();
+        this.fph = fph;
     }
 
     public void load_player(UUID p, Kit kit_to_edit) 
     {
+        FFAPlayer a = fph.getFFAPlayers().get(p);
+        if (a != null)
+        {
+            idle_players.put(p, a);
+            fph.removePlayerFromIdle(p);
+        }
         kit_editor_players.put(p, kit_to_edit);
         Bukkit.getServer().getPluginManager().callEvent(new KitEditorPlayerLoadEvent(Bukkit.getPlayer(p), kit_to_edit));
     }
@@ -46,6 +60,13 @@ public class KitEditorManager
     public void unload_player(UUID p) 
     {
         kit_editor_players.remove(p);
+        if (idle_players.containsKey(p))
+        {
+            fph.addPlayerToIdle(p, idle_players.get(p));
+            idle_players.remove(p);
+            ItemStack respawn_item = PlayerUtils.getRespawnItem();
+            Bukkit.getPlayer(p).getInventory().setItem(4, respawn_item);
+        }
         Bukkit.getServer().getPluginManager().callEvent(new KitEditorPlayerUnloadEvent(Bukkit.getPlayer(p)));
     }
 
@@ -83,12 +104,12 @@ public class KitEditorManager
         return null;
     }
 
-    public Map<UUID, Kit> getPlayers() 
+    public Map<UUID, Kit> getKitEditorPlayers() 
     {
         return this.kit_editor_players;
     }
 
-    public void removeEditableKit(String name) 
+    public void removeEditableKits(String name) 
     {
         try
         {
@@ -98,5 +119,47 @@ public class KitEditorManager
         {
             e.printStackTrace();
         }
+    }
+
+    public void removeEditableKits(UUID p) 
+    {
+        try
+        {
+            ekdb.removeAllEditedKits(p);
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public void removeEditableKits(UUID p, String kit_name) 
+    {
+        try
+        {
+            ekdb.removeAllEditedKits(p, kit_name);
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public List<String> getEditedKitNames(UUID p)
+    {
+        List<String> names = new ArrayList<>();
+        try 
+        {
+            names.addAll(ekdb.getPlayerEditedKitNames(p));
+        } catch (SQLException e) 
+        {
+            e.printStackTrace();
+        }
+        return names;
+    }
+
+    public Map<UUID, FFAPlayer> getPreviouslyIdlePlayers()
+    {
+        return this.idle_players;
     }
 }

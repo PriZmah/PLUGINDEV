@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
 import org.bukkit.Location;
+import org.bukkit.Material;
 
 import com.gmail.prizmahdiep.objects.SerializableSpawnLocation;
 import com.gmail.prizmahdiep.objects.SpawnLocation;
@@ -27,13 +28,13 @@ public class SpawnManager
     {
         this.spawns_folder = spawns_folder;
         if (!spawns_folder.isDirectory()) throw new IOException("File is not a directory");
-        this.gson = new GsonBuilder().setPrettyPrinting().create();
+        this.gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
         this.spawns = getSpawnsFromFiles();
     }
 
-    public boolean createSpawn(String name, String type, Location location)
+    public boolean createSpawn(String name, String type, String display_name, String lore, Location location, Material m)
     {
-        SpawnLocation sa = new SpawnLocation("", location, type);
+        SpawnLocation sa = new SpawnLocation("", location, type, display_name, lore, m);
         if (!isValidSpawn(sa)) return false;
         
         SerializableSpawnLocation spawn_serialized = new SerializableSpawnLocation(sa);

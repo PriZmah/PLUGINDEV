@@ -1,5 +1,6 @@
 package com.gmail.prizmahdiep.commands;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.entity.Player;
@@ -18,7 +19,7 @@ import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Subcommand;
 import net.md_5.bungee.api.ChatColor;
 
-@CommandAlias("editkit|ek")
+@CommandAlias("kiteditor|ke")
 @CommandPermission("ffautils.editkit")
 public class CommandEditKit extends BaseCommand
 {
@@ -41,15 +42,12 @@ public class CommandEditKit extends BaseCommand
         UUID po = p.getUniqueId();
         Kit kit_to_edit = km.getKits().get(kit_name.toUpperCase());
         
-        if (kem.EditedKitExists(po, kit_name))
-            kit_to_edit.setContents(kem.getEditedKit(po, kit_name));
-        
         if (kit_to_edit == null) 
         {
             p.sendMessage(ChatColor.RED + "This kit does not exist");
             return;
         }
-        if (kem.getPlayers().get(po) != null)
+        if (kem.getKitEditorPlayers().get(po) != null)
         {
             p.sendMessage(ChatColor.RED + "You are already in the kit editor.");
             return;
@@ -69,7 +67,7 @@ public class CommandEditKit extends BaseCommand
     @Subcommand("exit")
     public void onKitEditCancel(Player p)
     {
-        if (kem.getPlayers().get(p.getUniqueId()) != null) kem.unload_player(p.getUniqueId());
+        if (kem.getKitEditorPlayers().get(p.getUniqueId()) != null) kem.unload_player(p.getUniqueId());
         else p.sendMessage(ChatColor.RED + "You are not in the kit editor");
     }
 
@@ -77,7 +75,7 @@ public class CommandEditKit extends BaseCommand
     public void onKitEditSave(Player p)
     {
         UUID puid = p.getUniqueId();
-        Kit k = kem.getPlayers().get(puid);
+        Kit k = kem.getKitEditorPlayers().get(puid);
         if (k != null)
         {
             new BukkitRunnable() {
@@ -91,5 +89,50 @@ public class CommandEditKit extends BaseCommand
             }.runTaskAsynchronously(pl);
         }
         else p.sendMessage(ChatColor.RED + "You are not in the kit editor");
+    }
+
+    @Subcommand("restore")
+    public void onEditedKitRestore(Player p, String kit_name)
+    {
+        UUID puid = p.getUniqueId();
+        if (kem.EditedKitExists(puid, kit_name.toUpperCase()))
+            new BukkitRunnable() {
+                @Override
+                public void run()
+                {
+                    kem.removeEditableKits(puid, kit_name.toUpperCase());
+                    p.sendMessage(ChatColor.AQUA + "Kit restored to its original state");
+                }
+            }.runTaskAsynchronously(pl);
+        else p.sendMessage(ChatColor.RED + "This kit does not exist or you haven't edited it yet");
+    }
+
+    @Subcommand("clearkits")
+    public void onEditedKitsClear(Player p)
+    {
+        new BukkitRunnable() {
+            @Override
+            public void run()
+            {
+                kem.removeEditableKits(p.getUniqueId());
+                p.sendMessage(ChatColor.AQUA + "All kits cleared");
+            }
+        }.runTaskAsynchronously(pl);
+    }
+
+    @Subcommand("list")
+    public void onEditedKitsList(Player p)
+    {
+        p.sendMessage(ChatColor.AQUA + "Edited kits list:");
+        new BukkitRunnable()
+        {
+            @Override
+            public void run()
+            {
+                List<String> l = kem.getEditedKitNames(p.getUniqueId());
+                for (String i : l)
+                    p.sendMessage(ChatColor.WHITE + i);
+            }
+        }.runTaskAsynchronously(pl);
     }
 }

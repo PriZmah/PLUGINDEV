@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.io.BukkitObjectInputStream;
@@ -20,16 +21,14 @@ public class KitBase64Util
 {
     public static String itemStackArrayToBase64(ItemStack[] items) throws IllegalStateException
     {
-        try 
+        try (ByteArrayOutputStream stream = new ByteArrayOutputStream())
         {
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
             DataOutput output = new DataOutputStream(stream);
-
             output.writeInt(items.length);
             
             for (ItemStack i : items)
             {
-                if (i == null) 
+                if (i == null || i.getType().equals(Material.AIR)) 
                 {
                     output.writeInt(0);
                     continue;
@@ -73,11 +72,8 @@ public class KitBase64Util
 
     public static String potionEffectCollectionToBase64(Collection<PotionEffect> potionEffects) throws IllegalStateException
     {
-        try 
-        {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-			BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream);
-			
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream(); BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream);)
+        {		
 			dataOutput.writeInt(potionEffects.size());
 			
 			for ( Iterator<PotionEffect> i = potionEffects.iterator(); i.hasNext(); )
@@ -94,10 +90,8 @@ public class KitBase64Util
 
     public static Collection<PotionEffect> potionEffectsFromBase64(String data) throws IOException
     {
-		try 
+		try (ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64Coder.decodeLines(data)); BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream);)
         {
-			ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64Coder.decodeLines(data));
-			BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream);
 			Collection<PotionEffect> potionEffects = new ArrayList<PotionEffect>();
 			int length = dataInput.readInt();
 			

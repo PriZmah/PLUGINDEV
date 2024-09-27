@@ -5,9 +5,22 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -15,9 +28,12 @@ import com.gmail.prizmahdiep.FFAUtils;
 import com.gmail.prizmahdiep.managers.FFAPlayersManager;
 import com.gmail.prizmahdiep.managers.KitEditorManager;
 import com.gmail.prizmahdiep.managers.KitManager;
+import com.gmail.prizmahdiep.managers.SelectorManager;
 import com.gmail.prizmahdiep.managers.SpawnManager;
+import com.gmail.prizmahdiep.objects.EditableSelectorInv;
 import com.gmail.prizmahdiep.objects.FFAPlayer;
 import com.gmail.prizmahdiep.objects.Kit;
+import com.gmail.prizmahdiep.objects.Selector;
 import com.gmail.prizmahdiep.objects.SpawnLocation;
 import com.gmail.prizmahdiep.utils.PlayerUtils;
 
@@ -28,6 +44,7 @@ import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Optional;
 import co.aikar.commands.annotation.Subcommand;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.md_5.bungee.api.ChatColor;
 
 @CommandAlias("futils|ffa|ffautils")
@@ -39,14 +56,18 @@ public class CommandFFAUtils extends BaseCommand
     private FFAPlayersManager fph;
     private FFAUtils pl;
     private KitEditorManager kem;
+    private SelectorManager sem;
+    private MiniMessage minimessage_deserializer;
 
-    public CommandFFAUtils(SpawnManager sp, KitManager km, FFAPlayersManager fph, FFAUtils pl, KitEditorManager kem) 
+    public CommandFFAUtils(SpawnManager sp, KitManager km, FFAPlayersManager fph, FFAUtils pl, KitEditorManager kem, SelectorManager sem, MiniMessage minimessage_deserializer) 
     {
         this.km = km;
         this.sm = sp;
         this.fph = fph;
         this.pl = pl;
         this.kem = kem;
+        this.sem = sem;
+        this.minimessage_deserializer = minimessage_deserializer;
     }
 
     @Default
@@ -90,6 +111,14 @@ public class CommandFFAUtils extends BaseCommand
                     (kit.isEditable() ? ChatColor.YELLOW + " - " + ChatColor.GRAY + "editable" : "")
                 )
             );
+        }
+
+        @Subcommand("selectors")
+        public void onListSelectors(CommandSender p)
+        {
+            p.sendMessage(ChatColor.AQUA + "Available selectors:");
+            for (Selector i : sem.getSelectors().values())
+                p.sendMessage(minimessage_deserializer.deserialize(i.getDisplayName() + "<yellow> - </yellow>" + i.getID()));
         }
 
         @Subcommand("ffaplayers")
@@ -141,7 +170,9 @@ public class CommandFFAUtils extends BaseCommand
                 @Override
                 public void run()
                 {
-                    if (km.createKit(kit_name.toUpperCase(), contents, pf, Boolean.parseBoolean(restorable), Boolean.parseBoolean(editable)))
+                    if (km.createKit(kit_name.toUpperCase(), contents, pf, 
+                                    Boolean.parseBoolean(restorable), 
+                                    Boolean.parseBoolean(editable), kit_name))
                         p.sendMessage(ChatColor.AQUA + "Kit " + kit_name + " created");
                     else
                         p.sendMessage(ChatColor.RED + "Kit " + kit_name + " already exist");
@@ -157,15 +188,67 @@ public class CommandFFAUtils extends BaseCommand
                 @Override
                 public void run()
                 {
-                    if (sm.createSpawn(spawn_name.toUpperCase(), type.toLowerCase(), p.getLocation()))
+                    if (sm.createSpawn(spawn_name.toUpperCase(), type.toLowerCase(), spawn_name, "Click to teleport.", p.getLocation(), Material.GRAY_CONCRETE))
                         p.sendMessage(ChatColor.AQUA + "Spawn " + spawn_name + " created");
                     else
                         p.sendMessage(ChatColor.RED + "Could not create spawn " + spawn_name);
                 }
             }.runTaskAsynchronously(pl);
         }
+
+        @Subcommand("selector")
+        @CommandCompletion("kit default_spawn zombie|husk|drowned|piglin|zombified_piglin|skeleton|wither_skeleton|stray|armor_stand")
+        public void onSelectorCreate(Player s, String kit, String default_spawn, String type)
+        {
+            Kit k = km.getKits().get(kit.toUpperCase());
+            if (k == null) { s.sendMessage(ChatColor.RED + "Invalid kit"); return; }
+
+            SpawnLocation ss = sm.getSpawns().get(default_spawn.toUpperCase());
+            if (ss == null) { s.sendMessage(ChatColor.RED + "Invalid spawn"); return; }
+            
+            EntityType et = EntityType.fromName(type);
+            World wrld = s.getWorld();
+            Location loc = s.getLocation();
+            LivingEntity l = (LivingEntity) wrld.spawnEntity(loc, et);
+
+            if (l instanceof ArmorStand) 
+            {
+                ((ArmorStand) l).setArms(true);
+                ((ArmorStand) l).setBasePlate(false);
+            }
+
+            l.setCollidable(false);
+            l.setSilent(true);
+            l.setGravity(false);
+            l.setRemoveWhenFarAway(false);
+            l.setAI(false);
+            l.setCustomNameVisible(true);
+
+            EntityEquipment etq = l.getEquipment();
+            etq.setArmorContents(k.getArmorContents());
+            etq.setItemInMainHand(k.getMainhandItem());
+            etq.setItemInOffHand(k.getOffhandItem());
+
+            l.customName(minimessage_deserializer.deserialize("<!i>" + k.getDisplayName()));
+            
+            PersistentDataContainer epdc = l.getPersistentDataContainer();
+            NamespacedKey key = new NamespacedKey(pl, "selector-entity-type-id");
+            Selector sel = new Selector(l, ss.getName(), k.getName(), k.getDisplayName(), "<red>Select a spawn</red>");
+
+            sel.addSpawn(ss.getName());
+            epdc.set(key, PersistentDataType.INTEGER, sel.getID());
+
+            new BukkitRunnable() {
+                @Override
+                public void run()
+                {
+                    sem.addSelector(sel.getID(), sel);
+                }
+            }.runTaskAsynchronously(pl);
+        }
     }
 
+    
     @Subcommand("remove")
     @CommandPermission("ffautils.admin.remove")
     public class CommandRemove extends BaseCommand
@@ -177,6 +260,7 @@ public class CommandFFAUtils extends BaseCommand
         }
 
         @Subcommand("spawn")
+        @CommandCompletion("spawn_name")
         public void onSpawnRemove(CommandSender p, String spawn_name)
         {  
             new BukkitRunnable() {
@@ -192,6 +276,7 @@ public class CommandFFAUtils extends BaseCommand
         }
 
         @Subcommand("kit")
+        @CommandCompletion("kit_name")
         public void onKitRemove(CommandSender p, String kit_name)
         {
             new BukkitRunnable() {
@@ -199,15 +284,29 @@ public class CommandFFAUtils extends BaseCommand
                 public void run()
                 {
                     if (km.getKits().get(kit_name.toUpperCase()).isEditable())
-                    {
-                        kem.removeEditableKit(kit_name.toUpperCase());
-                    }
+                        kem.removeEditableKits(kit_name.toUpperCase());
                     if (km.removeKit(kit_name.toUpperCase()))
                         p.sendMessage(ChatColor.AQUA + "Kit " + kit_name + " deleted succesfully");
                     else
                         p.sendMessage(ChatColor.RED + "Kit " + kit_name + " does not exist");
                 }
             }.runTaskAsynchronously(pl);
+        }
+
+        @Subcommand("selector")
+        @CommandCompletion("id")
+        public void onSelectorRemove(CommandSender p, int id)
+        {
+            if (!sem.getSelectors().containsKey(id))
+            {
+                p.sendMessage(ChatColor.RED + "This selector does not exist");
+                return;
+            }
+
+            Selector s = sem.getSelectors().get(id);
+            s.getEntity().remove();
+            sem.removeSelector(id);
+            p.sendMessage(ChatColor.AQUA + "Selector removed successfully");
         }
     }
 
@@ -285,18 +384,42 @@ public class CommandFFAUtils extends BaseCommand
         @Default
         public void onDefault(CommandSender p)
         {
+            for (Selector i : sem.getSelectors().values()) 
+                if (i.getEntity() != null) 
+                {   
+                    i.getEntity().remove();
+                    i.setEntity(null);
+                }
             new BukkitRunnable() {
                 @Override
                 public void run()
                 {
-                    p.sendMessage(ChatColor.AQUA + "Reloading Kits and Spawns");
+                    p.sendMessage(ChatColor.AQUA + "Reloading config, kits, spawns and selectors");
                     int reloaded_kits = km.reloadKits();
                     int reloaded_spawns = sm.reloadSpawns();
+                    int reloaded_selectors = sem.reloadSelectors();
                     p.sendMessage(ChatColor.AQUA + "" + reloaded_kits + " kits reloaded");
                     p.sendMessage(ChatColor.AQUA + "" + reloaded_spawns + " spawns reloaded");
+                    new BukkitRunnable() {
+                        @Override
+                        public void run()
+                        {
+                            sem.getCachedInventories().clear();
+                            for (Selector i : sem.getSelectors().values())
+                            {
+                                LivingEntity j = (LivingEntity) i.getEntity();
+                                j.customName(minimessage_deserializer.deserialize(i.getDisplayName()));
+                                EntityEquipment jeq = j.getEquipment();
+                                Kit k = km.getKits().get(i.getKit());
+                                jeq.setArmorContents(k.getArmorContents());
+                                jeq.setItemInMainHand(k.getMainhandItem());
+                                jeq.setItemInOffHand(k.getOffhandItem());
+                            }
+                        }
+                    }.runTask(pl);
+                    p.sendMessage(ChatColor.AQUA + "" + reloaded_selectors + " selectors reloaded");
                 }
             }.runTaskAsynchronously(pl);
-            // lo otro
         }
 
         @Subcommand("kits")
@@ -323,6 +446,45 @@ public class CommandFFAUtils extends BaseCommand
                     p.sendMessage(ChatColor.AQUA + "Reloading Spawns");
                     int reloaded_spawns = sm.reloadSpawns();
                     p.sendMessage(ChatColor.AQUA + "" + reloaded_spawns + " spawns reloaded");
+                }
+            }.runTaskAsynchronously(pl);
+        }
+
+        @Subcommand("selectors")
+        public void onReloadSelectors(CommandSender p)
+        {
+            for (Selector i : sem.getSelectors().values()) 
+                if (i.getEntity() != null) 
+                {   
+                    i.getEntity().remove();
+                    i.setEntity(null);
+                }
+            
+            new BukkitRunnable() {
+                @Override
+                public void run()
+                {
+                    p.sendMessage(ChatColor.AQUA + "Reloading selectors");
+                    int reloaded_selectors = sem.reloadSelectors();
+                    p.sendMessage(ChatColor.AQUA + "" + reloaded_selectors + " selectors reloaded");
+
+                    new BukkitRunnable() {
+                        @Override
+                        public void run()
+                        {
+                            sem.getCachedInventories().clear();
+                            for (Selector i : sem.getSelectors().values())
+                            {
+                                LivingEntity j = (LivingEntity) i.getEntity();
+                                j.customName(minimessage_deserializer.deserialize(i.getDisplayName()));
+                                EntityEquipment jeq = j.getEquipment();
+                                Kit k = km.getKits().get(i.getKit());
+                                jeq.setArmorContents(k.getArmorContents());
+                                jeq.setItemInMainHand(k.getMainhandItem());
+                                jeq.setItemInOffHand(k.getOffhandItem());
+                            }
+                        }
+                    }.runTask(pl);
                 }
             }.runTaskAsynchronously(pl);
         }
@@ -509,7 +671,141 @@ public class CommandFFAUtils extends BaseCommand
 
         FFAPlayer ffaplayer = fph.getFFAPlayers().get(Bukkit.getPlayer(p).getUniqueId());
         if (ffaplayer != null)  fph.movePlayerFromFFA(ffaplayer);
-        
+         
         s.sendMessage(ChatColor.AQUA + "Unloading " + p + " from ffa");
+    }
+
+    @Subcommand("selector")
+    @CommandPermission("ffautils.admin.selector")
+    public class CommandSelector extends BaseCommand
+    {
+        @Subcommand("info")
+        @CommandCompletion("id")
+        public void onSelectorInfo(CommandSender p, int id)
+        {
+            Selector s = sem.getSelectors().get(id);
+            if (s == null)
+            {
+                p.sendMessage(ChatColor.RED + "This selector does not exist");
+                return;
+            }
+
+            p.sendMessage(ChatColor.AQUA + "Selector " + ChatColor.WHITE + String.valueOf(id) + ":");
+            p.sendMessage(ChatColor.GRAY + "Display name: " + ChatColor.WHITE + s.getDisplayName());
+            p.sendMessage(ChatColor.GRAY + "Entity type: " + ChatColor.WHITE + s.getEntity().getType().toString());
+            p.sendMessage(ChatColor.GRAY + "Kit: " + ChatColor.WHITE + s.getKit());
+            p.sendMessage(ChatColor.GRAY + "Default spawn: " + ChatColor.WHITE + s.getDefaultSpawn());
+
+            String spawns = ChatColor.YELLOW + "{ " + ChatColor.WHITE;
+            for (String i : s.getSpawns().keySet()) spawns += i + " ";
+            spawns += ChatColor.YELLOW + "}";
+            p.sendMessage(ChatColor.GRAY + "Spawns: " + spawns);
+        }
+
+        @Subcommand("addspawn")
+        public void onAddSpawn(CommandSender p, int id, String spawn_name)
+        {
+            SpawnLocation s = sm.getSpawns().get(spawn_name.toUpperCase());
+            if (s == null)
+            {
+                p.sendMessage(ChatColor.RED + "This spawn does not exist.");
+                return;
+            }
+
+            Selector se = sem.getSelectors().get(id);
+
+            if (se == null)
+            {
+                p.sendMessage(ChatColor.RED + "This selector does not exist.");
+                return;
+            }
+
+            String spawn = s.getName();
+            if (se.getSpawns().isEmpty()) se.setDefaultSpawn(spawn);
+            se.addSpawn(spawn);
+            sem.getCachedInventories().remove(id);
+            new BukkitRunnable() {
+                @Override
+                public void run()
+                {
+                    sem.reloadProperties(id);
+                }
+            }.runTaskAsynchronously(pl);
+            p.sendMessage(ChatColor.AQUA + "Spawn " + spawn_name + " added to selector " + id);
+        }
+
+        @Subcommand("removespawn")
+        @CommandCompletion("id spawn_name")
+        public void onRemoveSpawn(CommandSender p, int id, String spawn_name)
+        {
+            SpawnLocation s = sm.getSpawns().get(spawn_name.toUpperCase());
+            if (s == null)
+            {
+                p.sendMessage(ChatColor.RED + "This spawn does not exist.");
+                return;
+            }
+
+            Selector se = sem.getSelectors().get(id);
+
+            if (se == null)
+            {
+                p.sendMessage(ChatColor.RED + "This selector does not exist.");
+                return;
+            }
+
+            se.removeSpawn(s.getName());
+            if (se.getDefaultSpawn() != null)
+                if (se.getDefaultSpawn().equals(s.getName())) se.setDefaultSpawn(null);
+                
+            sem.getCachedInventories().remove(id);
+            new BukkitRunnable() {
+                @Override
+                public void run()
+                {
+                    sem.reloadProperties(id);
+                }
+            }.runTaskAsynchronously(pl);
+            p.sendMessage(ChatColor.AQUA + "Spawn " + spawn_name + " removed from selector " + id);
+        }
+
+        @Subcommand("editlayout")
+        @CommandCompletion("id")
+        public void onEditLayout(Player p, int id)
+        {
+            Selector sel = sem.getSelectors().get(id);
+            
+            if (sel == null)
+            {
+                p.sendMessage("This selector does not exist");
+                return;
+            }
+            
+            EditableSelectorInv inv = new EditableSelectorInv(pl, 9*3, id, "<red>Edit selector layout</red>", minimessage_deserializer);
+            Map<String, Integer> spawns = sel.getSpawns();
+            if (spawns.isEmpty())
+            {
+                p.sendMessage(ChatColor.RED + "This selector has no valid spawns associated");
+                return;
+            }
+
+            p.sendMessage(ChatColor.AQUA + "Opening layout editor for selector " + id);
+            Inventory contents = inv.getInventory();
+            NamespacedKey key = new NamespacedKey(pl, "spawn-placeholder");
+
+            for (String i : spawns.keySet())
+            {
+                ItemStack spawn_placeholder = new ItemStack(Material.BLACK_CONCRETE);
+                ItemMeta im = spawn_placeholder.getItemMeta();
+                PersistentDataContainer pdc = im.getPersistentDataContainer();
+                pdc.set(key, PersistentDataType.STRING, i);
+                im.displayName(minimessage_deserializer.deserialize("<!i>" + "<blue>" + i + " placeholder</blue>"));
+                spawn_placeholder.setItemMeta(im);
+
+                contents.setItem(spawns.get(i), spawn_placeholder);
+            } 
+
+            p.openInventory(contents);
+            p.sendMessage(ChatColor.AQUA + "This Layout will be saved when the inventory closes");
+        }
     }
 }

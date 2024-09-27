@@ -94,6 +94,12 @@ public class FFAPlayersManager
             idle_ffa_players.remove(p);
     }
 
+    public void addPlayerToIdle(UUID p, FFAPlayer a)
+    {
+        if (!isIdle(p))
+            idle_ffa_players.put(p, a);
+    }
+
     public Map<UUID, FFAPlayer> getFFAPlayers()
     {
         return this.ffa_players;

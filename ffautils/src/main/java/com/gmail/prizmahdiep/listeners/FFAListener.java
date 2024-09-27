@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
@@ -64,18 +63,26 @@ public class FFAListener implements Listener
             PlayerUtils.teleportPlayerToSpawn(p, li);
             PlayerUtils.resetPlayerStatus(p);
             PlayerUtils.setPlayerKit(p, ki);
-            
-            if (ki.isEditable())
-            {
-                new BukkitRunnable() {
-                    @Override
-                    public void run()
+
+            new BukkitRunnable() {
+                @Override
+                public void run()
+                {
+                    if (ki.isEditable() && kem.EditedKitExists(p.getUniqueId(), ki.getName()))
                     {
                         ItemStack[] k = kem.getEditedKit(p.getUniqueId(), ki.getName());
-                        p.getInventory().setContents(k);
+                        new BukkitRunnable() 
+                        {
+                            @Override
+                            public void run() 
+                            {
+                                p.getInventory().setContents(k);
+                            }
+                        }.runTask(futils);
                     }
-                }.runTaskAsynchronously(futils);
-            }
+                    
+                }
+            }.runTaskAsynchronously(futils);
         } else p.sendMessage(ChatColor.RED + "Either the kit or the spawn is not valid.");
     }
 
@@ -92,12 +99,7 @@ public class FFAListener implements Listener
 
         if (!fph.isIdle(pf.getUUID())) return;
 
-        ItemStack respawn_item = new ItemStack(Material.getMaterial("PINK_DYE"));
-        NamespacedKey key = new NamespacedKey(futils, "respawn-item-type");
-        ItemMeta respawn_item_meta = respawn_item.getItemMeta();
-        respawn_item_meta.getPersistentDataContainer().set(key, PersistentDataType.BOOLEAN, true);
-        respawn_item_meta.displayName(Component.text(ChatColor.LIGHT_PURPLE + "Respawn to last location"));
-        respawn_item.setItemMeta(respawn_item_meta);
+        ItemStack respawn_item = PlayerUtils.getRespawnItem();
 
         pf.getPlayer().getInventory().setItem(4, respawn_item);
     }
@@ -166,7 +168,7 @@ public class FFAListener implements Listener
         ItemMeta item_meta = ev.getItem().getItemMeta();
 
         if (item_meta == null) return;
-
+        
         NamespacedKey key = new NamespacedKey(futils, "respawn-item-type");
         FFAPlayer fp;
         if (item_meta.getPersistentDataContainer().has(key, PersistentDataType.BOOLEAN))

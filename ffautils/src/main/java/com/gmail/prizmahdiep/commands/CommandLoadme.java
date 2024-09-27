@@ -3,6 +3,7 @@ package com.gmail.prizmahdiep.commands;
 import org.bukkit.entity.Player;
 
 import com.gmail.prizmahdiep.managers.FFAPlayersManager;
+import com.gmail.prizmahdiep.managers.KitEditorManager;
 import com.gmail.prizmahdiep.managers.KitManager;
 import com.gmail.prizmahdiep.managers.SpawnManager;
 import com.gmail.prizmahdiep.objects.Kit;
@@ -22,12 +23,14 @@ public class CommandLoadme extends BaseCommand
     private FFAPlayersManager fph;
     private KitManager km;
     private SpawnManager sm;
+    private KitEditorManager kem;
 
-    public CommandLoadme(FFAPlayersManager fph, KitManager km, SpawnManager sm)
+    public CommandLoadme(FFAPlayersManager fph, KitManager km, SpawnManager sm, KitEditorManager kem)
     {
         this.fph = fph;
         this.km = km;
         this.sm = sm;
+        this.kem = kem;
     }
 
     @Default
@@ -40,6 +43,12 @@ public class CommandLoadme extends BaseCommand
         if (fph.isOnFFA(p.getUniqueId()))
         {
             p.sendMessage(ChatColor.RED + "You are already in FFA");
+            return;
+        }
+
+        if (kem.getKitEditorPlayers().containsKey(p.getUniqueId()))
+        {
+            p.sendMessage(ChatColor.RED + "You have to exit the kit editor to do that");
             return;
         }
 

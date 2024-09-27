@@ -1,6 +1,6 @@
 #!/bin/bash
 
-nombre_archivo="ffautils-0.3-ALPHA.jar"
+nombre_archivo="ffautils-0.4-BETA.jar"
 viejo_archivo="/home/ubuntu/wodserver/plugins/$nombre_archivo"
 nuevo_archivo="/home/prizmah/Escritorio/FFAUTILS/ffautils/target/$nombre_archivo"
 viejo_hash="$(ssh servidor-oci "md5sum $viejo_archivo | awk '{print \$1}'")"
