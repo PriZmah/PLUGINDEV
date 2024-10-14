@@ -8,6 +8,7 @@ import java.util.UUID;
 public class FFAPlayer
 {
     private final UUID player_uuid;
+    private UUID opponent;
     private String player_kit, last_player_kit, chosen_spawn, last_chosen_spawn;
 
     public FFAPlayer(Player p, String kit, String spawn)
@@ -17,11 +18,17 @@ public class FFAPlayer
         this.player_kit = kit;
         this.last_chosen_spawn = "none";
         this.chosen_spawn = spawn;
+        this.opponent = null;
     }
 
     public Player getPlayer()
     {
         return Bukkit.getPlayer(player_uuid);
+    }
+
+    public UUID getOpponent()
+    {
+        return this.opponent;
     }
 
     public String getCurrentPlayerKitName()
@@ -67,5 +74,15 @@ public class FFAPlayer
     public void setLastSpawnName(String s)
     {
         this.last_chosen_spawn = s;
+    }
+
+    public void setOpponent(UUID p)
+    {
+        this.opponent = p;
+    }
+
+    public boolean hasOpponent()
+    {
+        return this.opponent != null;
     }
 }

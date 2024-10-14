@@ -64,13 +64,13 @@ public class CommandLoadme extends BaseCommand
             return; 
         }
 
-        if (!p.hasPermission("ffautils.loadme.kit." + kit))
+        if (!p.hasPermission("ffautils.loadme.kit." + kit.toLowerCase()))
         {
             p.sendMessage(ChatColor.RED + "You don't have permission to use this kit");
             return;  
         }
 
-        if (!p.hasPermission("ffautils.loadme.spawn." + spawn))
+        if (!p.hasPermission("ffautils.loadme.spawn." + spawn.toLowerCase()))
         {
             p.sendMessage(ChatColor.RED + "You don't have permission to use this spawn");
             return;  

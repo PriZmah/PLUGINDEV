@@ -34,8 +34,8 @@ import org.apache.commons.io.FilenameUtils;
 
 public class SelectorManager
 {
-    private Map<Integer, Selector> selectors;
-    private Map<Integer, Inventory> cached_inventories;
+    private Map<String, Selector> selectors;
+    private Map<String, Inventory> cached_inventories;
     private MiniMessage minimessage_deserializer;
     private File selectors_folder;
     private Gson gson;
@@ -55,45 +55,13 @@ public class SelectorManager
 
         for (Selector i : selectors.values())
         {
-            Location loc = i.getLocation();
-            if (!loc.getChunk().isLoaded())
-                loc.getChunk().load();
-           
-            LivingEntity l = (LivingEntity) loc.getWorld().spawnEntity(loc, i.getType());
-
-            l.customName(minimessage_deserializer.deserialize(i.getDisplayName()));
-            EntityEquipment jeq = l.getEquipment();
-            Kit k = kitman.getKits().get(i.getKit());
-            jeq.setArmorContents(k.getArmorContents());
-            jeq.setItemInMainHand(k.getMainhandItem());
-            jeq.setItemInOffHand(k.getOffhandItem());
-
-            
-            if (l instanceof ArmorStand) 
-            {
-                ((ArmorStand) l).setArms(true);
-                ((ArmorStand) l).setBasePlate(false);
-            }
-
-            l.setCollidable(false);
-            l.setSilent(true);
-            l.setGravity(false);
-            l.setRemoveWhenFarAway(false);
-            l.setAI(false);
-            l.setCustomNameVisible(true);
-
-            PersistentDataContainer epdc = l.getPersistentDataContainer();
-            NamespacedKey key = new NamespacedKey(pl, "selector-entity-type-id");
-            epdc.set(key, PersistentDataType.INTEGER, i.getID());
-            if (i.getEntity() != null)
-                i.getEntity().remove();
-            i.setEntity(l);
+            reloadSelector(i);
         }
     }
 
-    private Map<Integer, Selector> getSelectorsFromFiles() 
+    private Map<String, Selector> getSelectorsFromFiles() 
     {
-        Map<Integer, Selector> selectors = new HashMap<>();
+        Map<String, Selector> selectors = new HashMap<>();
         File[] selector_files = selectors_folder.listFiles();
         for (File selector_file : selector_files)
             if (selector_file.isFile() && selector_file.getName().endsWith(".json"))
@@ -118,17 +86,17 @@ public class SelectorManager
         return selectors;
     }
 
-    public Map<Integer, Selector> getSelectors()
+    public Map<String, Selector> getSelectors()
     {
         return this.selectors;
     }
     
-    public Map<Integer, Inventory> getCachedInventories()
+    public Map<String, Inventory> getCachedInventories()
     {
         return this.cached_inventories;
     }
 
-    public boolean addSelector(Integer k, Selector v)
+    public boolean addSelector(String k, Selector v)
     {
         SerializableSelector ser = new SerializableSelector(v);
         if (getSelectorFile(String.valueOf(v.getID())) == null)
@@ -150,7 +118,7 @@ public class SelectorManager
         return true;
     }
 
-    public boolean removeSelector(Integer k)
+    public boolean removeSelector(String k)
     {
         File df = getSelectorFile(String.valueOf(k));
         if (selectors.containsKey(k)) selectors.remove(k);
@@ -177,48 +145,55 @@ public class SelectorManager
             @Override
             public void run()
             {
-                for (Selector i : selectors.values())
-                {
-                    Location loc = i.getLocation();
-                    if (!loc.getChunk().isLoaded())
-                        loc.getChunk().load();
-                
-                    LivingEntity l = (LivingEntity) loc.getWorld().spawnEntity(loc, i.getType());
-                
-                    l.customName(minimessage_deserializer.deserialize(i.getDisplayName()));
-                    EntityEquipment jeq = l.getEquipment();
-                    Kit k = kitman.getKits().get(i.getKit());
-                    jeq.setArmorContents(k.getArmorContents());
-                    jeq.setItemInMainHand(k.getMainhandItem());
-                    jeq.setItemInOffHand(k.getOffhandItem());
-                
-                    
-                    if (l instanceof ArmorStand) 
-                    {
-                        ((ArmorStand) l).setArms(true);
-                        ((ArmorStand) l).setBasePlate(false);
-                    }
-                
-                    l.setCollidable(false);
-                    l.setSilent(true);
-                    l.setGravity(false);
-                    l.setRemoveWhenFarAway(false);
-                    l.setAI(false);
-                    l.setCustomNameVisible(true);
-                
-                    PersistentDataContainer epdc = l.getPersistentDataContainer();
-                    NamespacedKey key = new NamespacedKey(pl, "selector-entity-type-id");
-                    epdc.set(key, PersistentDataType.INTEGER, i.getID());
-                    
-                    if (i.getEntity() != null) i.getEntity().remove();
-                    i.setEntity(l);
-                }
+                for (Selector i : selectors.values()) reloadSelector(i);
             }
         }.runTask(pl);
         return selectors.size();
     }
+    
+    public void reloadSelector(Selector i) 
+    {
+        Location loc = i.getLocation();
+        if (loc == null) return;
 
-    public void reloadProperties(int id) 
+        if (!loc.getChunk().isLoaded())
+            loc.getChunk().load();
+    
+        LivingEntity l = (LivingEntity) loc.getWorld().spawnEntity(loc, i.getType());
+    
+        l.customName(minimessage_deserializer.deserialize(i.getDisplayName()));
+        EntityEquipment jeq = l.getEquipment();
+        Kit k = kitman.getKits().get(i.getKit());
+        if (k != null) 
+        {
+            jeq.setArmorContents(k.getArmorContents());
+            jeq.setItemInMainHand(k.getMainhandItem());
+            jeq.setItemInOffHand(k.getOffhandItem());
+        }
+    
+        
+        if (l instanceof ArmorStand) 
+        {
+            ((ArmorStand) l).setArms(true);
+            ((ArmorStand) l).setBasePlate(false);
+        }
+    
+        l.setCollidable(false);
+        l.setSilent(true);
+        l.setGravity(false);
+        l.setRemoveWhenFarAway(false);
+        l.setAI(false);
+        l.setCustomNameVisible(true);
+    
+        PersistentDataContainer epdc = l.getPersistentDataContainer();
+        NamespacedKey key = new NamespacedKey(pl, "selector-entity-type-id");
+        epdc.set(key, PersistentDataType.STRING, i.getID());
+        
+        if (i.getEntity() != null) i.getEntity().remove();
+        i.setEntity(l);
+    }
+
+    public void reloadProperties(String id) 
     {
         File sel_file = getSelectorFile(String.valueOf(id));
         if (sel_file == null) return;

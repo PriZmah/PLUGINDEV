@@ -1,0 +1,5 @@
+# Commands to be disabled when the player is combat logged
+blocked-commands:
+  - "k"
+  - "spawn"
+  - "die"

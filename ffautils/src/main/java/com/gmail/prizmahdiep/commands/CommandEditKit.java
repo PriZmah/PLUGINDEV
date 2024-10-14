@@ -10,7 +10,9 @@ import com.gmail.prizmahdiep.FFAUtils;
 import com.gmail.prizmahdiep.managers.FFAPlayersManager;
 import com.gmail.prizmahdiep.managers.KitEditorManager;
 import com.gmail.prizmahdiep.managers.KitManager;
+import com.gmail.prizmahdiep.managers.SpawnManager;
 import com.gmail.prizmahdiep.objects.Kit;
+import com.gmail.prizmahdiep.objects.SpawnLocation;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
@@ -20,20 +22,22 @@ import co.aikar.commands.annotation.Subcommand;
 import net.md_5.bungee.api.ChatColor;
 
 @CommandAlias("kiteditor|ke")
-@CommandPermission("ffautils.editkit")
+@CommandPermission("ffautils.kiteditor")
 public class CommandEditKit extends BaseCommand
 {
     private KitManager km;
     private KitEditorManager kem;
     private FFAUtils pl;
     private FFAPlayersManager fph;
+    private SpawnManager sm;
 
-    public CommandEditKit(KitManager km, KitEditorManager kem, FFAUtils pl, FFAPlayersManager fph)
+    public CommandEditKit(KitManager km, KitEditorManager kem, FFAUtils pl, FFAPlayersManager fph, SpawnManager sm)
     {
         this.km = km;
         this.kem = kem;
         this.pl = pl;
         this.fph = fph;
+        this.sm = sm;
     }
 
     @Default
@@ -59,12 +63,19 @@ public class CommandEditKit extends BaseCommand
             return;
         }
 
+        if (sm.getSpawnOfType(SpawnLocation.EDITOR_ROOM) == null)
+        {
+            p.sendMessage(ChatColor.RED + "The editor room is not available");
+            return;
+        }
+        
         if (kit_to_edit.isEditable())
             kem.load_player(p.getUniqueId(), kit_to_edit);
         else p.sendMessage(ChatColor.RED + "This kit is not editable");
     }
 
     @Subcommand("exit")
+    @CommandPermission("ffautils.kiteditor.exit")
     public void onKitEditCancel(Player p)
     {
         if (kem.getKitEditorPlayers().get(p.getUniqueId()) != null) kem.unload_player(p.getUniqueId());
@@ -72,6 +83,7 @@ public class CommandEditKit extends BaseCommand
     }
 
     @Subcommand("save")
+    @CommandPermission("ffautils.kiteditor.save")
     public void onKitEditSave(Player p)
     {
         UUID puid = p.getUniqueId();
@@ -92,6 +104,7 @@ public class CommandEditKit extends BaseCommand
     }
 
     @Subcommand("restore")
+    @CommandPermission("ffautils.kiteditor.restore")
     public void onEditedKitRestore(Player p, String kit_name)
     {
         UUID puid = p.getUniqueId();
@@ -108,6 +121,7 @@ public class CommandEditKit extends BaseCommand
     }
 
     @Subcommand("clearkits")
+    @CommandPermission("ffautils.kiteditor.clearkits")
     public void onEditedKitsClear(Player p)
     {
         new BukkitRunnable() {
@@ -121,6 +135,7 @@ public class CommandEditKit extends BaseCommand
     }
 
     @Subcommand("list")
+    @CommandPermission("ffautils.kiteditor.list")
     public void onEditedKitsList(Player p)
     {
         p.sendMessage(ChatColor.AQUA + "Edited kits list:");

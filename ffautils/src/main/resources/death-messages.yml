@@ -1,2 +1,6 @@
+# If more messages are added, they will be shown randomly (Minimessage supported!)
+# Placeholders: 
+# {victim_username}, {attacker_username}, 
+# {attacker_hp}, {attacker_hearts}
 messages:
-  - "Bochesitos"
+  - "<red>{victim_username}</red> was killed by <green>{attacker_username}</green> with <gold>{attacker_hp}</gold> left"

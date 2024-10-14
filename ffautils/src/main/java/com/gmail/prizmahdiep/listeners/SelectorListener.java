@@ -67,8 +67,7 @@ public class SelectorListener implements Listener
         
         PersistentDataContainer pdc = en.getPersistentDataContainer();
         NamespacedKey key = new NamespacedKey(pl, "selector-entity-type-id");
-        if (!pdc.has(key, PersistentDataType.INTEGER)) return;
-        e.setCancelled(true);
+        if (!pdc.has(key, PersistentDataType.STRING)) return;
         
         Player p = e.getPlayer();
         if (fpm.isOnFFA(p.getUniqueId())) 
@@ -76,13 +75,21 @@ public class SelectorListener implements Listener
             p.sendMessage(ChatColor.RED + "You are already in FFA");
             return;
         }
-
-        int id = pdc.get(key, PersistentDataType.INTEGER);
+        
+        e.setCancelled(true);
+        
+        String id = pdc.get(key, PersistentDataType.STRING);
         Inventory inv = null;
         if (sem.getCachedInventories().containsKey(id)) inv = sem.getCachedInventories().get(id);
         else
         {
             Selector sl = sem.getSelectors().get(id);
+            if (sl == null)
+            {
+                p.sendMessage(ChatColor.RED + "Something went wrong with this selector");
+                en.remove();
+                return;
+            }
             SelectorInv sinv = new SelectorInv(pl, 27, sl.getID(), sl.getContainerName(), mm);
             inv = sinv.getInventory();
             Map<String, Integer> sps = sl.getSpawns();
@@ -102,7 +109,7 @@ public class SelectorListener implements Listener
                     if (sl.getDefaultSpawn().equals(i)) sl.setDefaultSpawn(null);
                     continue; 
                 }
-
+                
                 Material thmb = curr.getThumbnail();
                 ItemStack item_to_add = new ItemStack(thmb == null ? Material.GRAY_CONCRETE : thmb);
                 spawn_thumbnails.add(item_to_add);
@@ -113,14 +120,14 @@ public class SelectorListener implements Listener
 
                 List<Component> lores = new ArrayList<>();
                 lores.add(mm.deserialize("<!i>" + curr.getLore()));
-
+                
                 mi.lore(lores);
-
+                
                 PersistentDataContainer ipdc = mi.getPersistentDataContainer();
                 ipdc.set(key2, PersistentDataType.STRING, curr.getName());
-
+                
                 item_to_add.setItemMeta(mi);
-
+                
                 inv.setItem(sps.get(i), item_to_add);
             }
             Bukkit.getLogger().info("Caching selector inventory for selector " + id);
@@ -143,21 +150,29 @@ public class SelectorListener implements Listener
         PersistentDataContainer pdc = victim.getPersistentDataContainer();
         NamespacedKey key = new NamespacedKey(pl, "selector-entity-type-id");
 
-        if (!pdc.has(key, PersistentDataType.INTEGER)) return;
+        if (!pdc.has(key, PersistentDataType.STRING)) return;
         
         e.setCancelled(true);
-
+        
         if (fpm.isOnFFA(p.getUniqueId())) 
         {
             p.sendMessage(ChatColor.RED + "You are already in FFA");
             return;
         }
 
-        int id = pdc.get(key, PersistentDataType.INTEGER);
+        String id = pdc.get(key, PersistentDataType.STRING);
         Selector sel = sem.getSelectors().get(id);
+        if (sel == null)
+        {
+            p.sendMessage(ChatColor.RED + "Something went wrong with this selector");
+            victim.remove();
+            return;
+        }
+
         SpawnLocation sl = sm.getSpawns().get(sel.getDefaultSpawn());
         Kit k = km.getKits().get(sel.getKit());
-
+        
+        
         if (sl == null)
         {
             p.sendMessage(ChatColor.RED + "This spawn does not exist");
@@ -169,6 +184,18 @@ public class SelectorListener implements Listener
         {
             p.sendMessage(ChatColor.RED + "This kit does not exist");
             sel.setKit(null);
+            return;
+        }
+
+        if (!p.hasPermission("ffautils.loadme.kit." + k.getName().toLowerCase()))
+        {
+            p.sendMessage(ChatColor.RED + "You don't have permission to use this kit");
+            return;
+        }
+
+        if (!p.hasPermission("ffautils.loadme.spawn." + sl.getName().toLowerCase()))
+        {
+            p.sendMessage(ChatColor.RED + "You don't have permission to use this spawn");
             return;
         }
 
@@ -194,8 +221,10 @@ public class SelectorListener implements Listener
     public void onPlayerSpawnMenuInteract(InventoryClickEvent e)
     {
         Inventory clicked_inventory = e.getClickedInventory();
+        if (clicked_inventory == null) return;
+
         InventoryHolder inv_holder = clicked_inventory.getHolder(false);
-        if (clicked_inventory == null || !(inv_holder instanceof SelectorInv)) return;
+        if (!(inv_holder instanceof SelectorInv)) return;
         
         e.setCancelled(true);
 
@@ -229,6 +258,18 @@ public class SelectorListener implements Listener
             p.sendMessage(ChatColor.RED + "This spawn does not exist");
             sl.removeSpawn(spawn_to_teleport);
             sl.setDefaultSpawn(null);
+            return;
+        }
+
+        if (!p.hasPermission("ffautils.loadme.kit." + kit_to_use.getName().toLowerCase()))
+        {
+            p.sendMessage(ChatColor.RED + "You don't have permission to use this kit");
+            return;
+        }
+
+        if (!p.hasPermission("ffautils.loadme.spawn." + spawn_location.getName().toLowerCase()))
+        {
+            p.sendMessage(ChatColor.RED + "You don't have permission to use this spawn");
             return;
         }
 

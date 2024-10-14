@@ -15,7 +15,6 @@ import com.gmail.prizmahdiep.events.KitEditorPlayerLoadEvent;
 import com.gmail.prizmahdiep.events.KitEditorPlayerUnloadEvent;
 import com.gmail.prizmahdiep.objects.FFAPlayer;
 import com.gmail.prizmahdiep.objects.Kit;
-import com.gmail.prizmahdiep.utils.PlayerUtils;
 
 public class KitEditorManager 
 {
@@ -64,8 +63,6 @@ public class KitEditorManager
         {
             fph.addPlayerToIdle(p, idle_players.get(p));
             idle_players.remove(p);
-            ItemStack respawn_item = PlayerUtils.getRespawnItem();
-            Bukkit.getPlayer(p).getInventory().setItem(4, respawn_item);
         }
         Bukkit.getServer().getPluginManager().callEvent(new KitEditorPlayerUnloadEvent(Bukkit.getPlayer(p)));
     }

@@ -9,7 +9,6 @@ import org.bukkit.entity.LivingEntity;
 
 public class Selector
 {
-    private static int id_count = 0;
     private Map<String, Integer> spawns; 
     private String default_spawn;
     private String kit;
@@ -18,9 +17,9 @@ public class Selector
     private Location loc;
     private LivingEntity uid;
     private EntityType type;
-    private int id;
+    private String id;
 
-    public Selector(LivingEntity uid, String ds, String k, String dn, String cn)
+    public Selector(LivingEntity uid, String ds, String k, String dn, String cn, String id)
     {
         this.uid = uid;
         this.spawns = new HashMap<>();
@@ -28,12 +27,12 @@ public class Selector
         this.kit = k;
         this.display_name = dn;
         this.container_name = cn;
-        this.id = ++id_count;
+        this.id = id;
         this.type = uid.getType();
         this.loc = uid.getLocation();
     }
 
-    public Selector(Location l, EntityType type, String default_spawn, String kit, String display_name, String container_name, int id, Map<String, Integer> spawns)
+    public Selector(Location l, EntityType type, String default_spawn, String kit, String display_name, String container_name, String id, Map<String, Integer> spawns)
     {
         this.loc = l;
         this.type = type;
@@ -43,6 +42,29 @@ public class Selector
         this.container_name = container_name;
         this.id = id;
         this.spawns = spawns;
+    }
+
+    public Selector(Selector s)
+    {
+        LivingEntity liv = s.getEntity();
+        Location l = s.getLocation();
+        EntityType t = s.getType();
+        String dfs = s.getDefaultSpawn();
+        String k = s.getKit();
+        String ds = s.getDisplayName();
+        String cn = s.getContainerName();
+        String id = s.getID();
+        Map<String, Integer> ss = s.getSpawns();
+
+        this.uid = liv;
+        this.loc = l;
+        this.type = t;
+        this.default_spawn = dfs;
+        this.kit = k;
+        this.display_name = ds;
+        this.container_name = cn;
+        this.id = id;
+        this.spawns = ss;
     }
 
     public Map<String, Integer> getSpawns()
@@ -70,7 +92,7 @@ public class Selector
         return this.container_name;
     }
 
-    public int getID()
+    public String getID()
     {
         return this.id;
     }
@@ -115,5 +137,30 @@ public class Selector
     public EntityType getType() 
     {
         return this.type;
+    }
+
+    public void setType(EntityType type)
+    {
+        this.type = type;
+    }
+
+    public void setDisplayName(String mm)
+    {
+        this.display_name = mm;
+    }
+
+    public void setContainerTitle(String minimsg) 
+    {
+        this.container_name = minimsg;
+    }
+
+    public void setLocation(Location location) 
+    {
+        this.loc = location;
+    }
+
+    public void setID(String newid) 
+    {
+        this.id = newid;
     }
 }

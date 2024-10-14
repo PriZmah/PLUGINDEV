@@ -25,9 +25,12 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.gmail.prizmahdiep.FFAUtils;
+import com.gmail.prizmahdiep.managers.BlockedCommandsManager;
+import com.gmail.prizmahdiep.managers.DeathMessagesManager;
 import com.gmail.prizmahdiep.managers.FFAPlayersManager;
 import com.gmail.prizmahdiep.managers.KitEditorManager;
 import com.gmail.prizmahdiep.managers.KitManager;
+import com.gmail.prizmahdiep.managers.RespawnItemManager;
 import com.gmail.prizmahdiep.managers.SelectorManager;
 import com.gmail.prizmahdiep.managers.SpawnManager;
 import com.gmail.prizmahdiep.objects.EditableSelectorInv;
@@ -36,6 +39,7 @@ import com.gmail.prizmahdiep.objects.Kit;
 import com.gmail.prizmahdiep.objects.Selector;
 import com.gmail.prizmahdiep.objects.SpawnLocation;
 import com.gmail.prizmahdiep.utils.PlayerUtils;
+import com.soundicly.jnanoidenhanced.jnanoid.NanoIdUtils;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
@@ -58,8 +62,23 @@ public class CommandFFAUtils extends BaseCommand
     private KitEditorManager kem;
     private SelectorManager sem;
     private MiniMessage minimessage_deserializer;
+    private RespawnItemManager rim;
+    private DeathMessagesManager dmm;
+    private BlockedCommandsManager bcm;
 
-    public CommandFFAUtils(SpawnManager sp, KitManager km, FFAPlayersManager fph, FFAUtils pl, KitEditorManager kem, SelectorManager sem, MiniMessage minimessage_deserializer) 
+    public CommandFFAUtils
+    (
+        SpawnManager sp, 
+        KitManager km, 
+        FFAPlayersManager fph, 
+        FFAUtils pl, 
+        KitEditorManager kem, 
+        SelectorManager sem, 
+        MiniMessage minimessage_deserializer, 
+        RespawnItemManager rim, 
+        DeathMessagesManager dmm,
+        BlockedCommandsManager bcm
+    ) 
     {
         this.km = km;
         this.sm = sp;
@@ -68,6 +87,9 @@ public class CommandFFAUtils extends BaseCommand
         this.kem = kem;
         this.sem = sem;
         this.minimessage_deserializer = minimessage_deserializer;
+        this.rim = rim;
+        this.dmm = dmm;
+        this.bcm = bcm;
     }
 
     @Default
@@ -87,6 +109,7 @@ public class CommandFFAUtils extends BaseCommand
         }
 
         @Subcommand("spawns")
+        @CommandPermission("ffautils.admin.list.spawns")
         public void onListSpawns(CommandSender p)
         {
             p.sendMessage(ChatColor.AQUA + "Available spawns:");
@@ -102,6 +125,7 @@ public class CommandFFAUtils extends BaseCommand
         }
 
         @Subcommand("kits")
+        @CommandPermission("ffautils.admin.list.kits")
         public void onListKits(CommandSender p)
         {
             p.sendMessage(ChatColor.AQUA + "Available kits:");
@@ -114,6 +138,7 @@ public class CommandFFAUtils extends BaseCommand
         }
 
         @Subcommand("selectors")
+        @CommandPermission("ffautils.admin.list.selectors")
         public void onListSelectors(CommandSender p)
         {
             p.sendMessage(ChatColor.AQUA + "Available selectors:");
@@ -122,6 +147,7 @@ public class CommandFFAUtils extends BaseCommand
         }
 
         @Subcommand("ffaplayers")
+        @CommandPermission("ffautils.admin.list.ffaplayers")
         public void onListFFAPlayers(CommandSender p)
         {
             p.sendMessage(ChatColor.AQUA + "Active FFA Players:");
@@ -149,6 +175,7 @@ public class CommandFFAUtils extends BaseCommand
 
         @Subcommand("kit")
         @CommandCompletion("name true|false")
+        @CommandPermission("ffautils.admin.create.kit")
         public void onCreateKit(Player p, String kit_name, @Optional @Default("false") String restorable, @Optional @Default("false") String editable)
         {
             PlayerInventory contents = p.getInventory();
@@ -182,6 +209,7 @@ public class CommandFFAUtils extends BaseCommand
 
         @Subcommand("spawn")
         @CommandCompletion("name " + SpawnLocation.SPAWN + "|" + SpawnLocation.STANDARD + "|" + SpawnLocation.EDITOR_ROOM + "|" + SpawnLocation.FTN)
+        @CommandPermission("ffautils.admin.create.spawn")
         public void onCreateSpawn(Player p, String spawn_name, String type)
         {   
             new BukkitRunnable() {
@@ -198,6 +226,7 @@ public class CommandFFAUtils extends BaseCommand
 
         @Subcommand("selector")
         @CommandCompletion("kit default_spawn zombie|husk|drowned|piglin|zombified_piglin|skeleton|wither_skeleton|stray|armor_stand")
+        @CommandPermission("ffautils.admin.create.selector")
         public void onSelectorCreate(Player s, String kit, String default_spawn, String type)
         {
             Kit k = km.getKits().get(kit.toUpperCase());
@@ -207,6 +236,12 @@ public class CommandFFAUtils extends BaseCommand
             if (ss == null) { s.sendMessage(ChatColor.RED + "Invalid spawn"); return; }
             
             EntityType et = EntityType.fromName(type);
+            if (et == null)
+            {
+                s.sendMessage(ChatColor.RED + "Entity type is not valid");
+                return;
+            }
+
             World wrld = s.getWorld();
             Location loc = s.getLocation();
             LivingEntity l = (LivingEntity) wrld.spawnEntity(loc, et);
@@ -223,6 +258,7 @@ public class CommandFFAUtils extends BaseCommand
             l.setRemoveWhenFarAway(false);
             l.setAI(false);
             l.setCustomNameVisible(true);
+            l.setPersistent(true);
 
             EntityEquipment etq = l.getEquipment();
             etq.setArmorContents(k.getArmorContents());
@@ -233,10 +269,10 @@ public class CommandFFAUtils extends BaseCommand
             
             PersistentDataContainer epdc = l.getPersistentDataContainer();
             NamespacedKey key = new NamespacedKey(pl, "selector-entity-type-id");
-            Selector sel = new Selector(l, ss.getName(), k.getName(), k.getDisplayName(), "<red>Select a spawn</red>");
+            Selector sel = new Selector(l, ss.getName(), k.getName(), k.getDisplayName(), "<red>Select a spawn</red>", NanoIdUtils.randomNanoId(5));
 
             sel.addSpawn(ss.getName());
-            epdc.set(key, PersistentDataType.INTEGER, sel.getID());
+            epdc.set(key, PersistentDataType.STRING, sel.getID());
 
             new BukkitRunnable() {
                 @Override
@@ -261,6 +297,7 @@ public class CommandFFAUtils extends BaseCommand
 
         @Subcommand("spawn")
         @CommandCompletion("spawn_name")
+        @CommandPermission("ffautils.admin.remove.spawn")
         public void onSpawnRemove(CommandSender p, String spawn_name)
         {  
             new BukkitRunnable() {
@@ -277,6 +314,7 @@ public class CommandFFAUtils extends BaseCommand
 
         @Subcommand("kit")
         @CommandCompletion("kit_name")
+        @CommandPermission("ffautils.admin.remove.kit")
         public void onKitRemove(CommandSender p, String kit_name)
         {
             new BukkitRunnable() {
@@ -295,7 +333,8 @@ public class CommandFFAUtils extends BaseCommand
 
         @Subcommand("selector")
         @CommandCompletion("id")
-        public void onSelectorRemove(CommandSender p, int id)
+        @CommandPermission("ffautils.admin.remove.selector")
+        public void onSelectorRemove(CommandSender p, String id)
         {
             if (!sem.getSelectors().containsKey(id))
             {
@@ -321,6 +360,7 @@ public class CommandFFAUtils extends BaseCommand
         }
 
         @Subcommand("kit")
+        @CommandPermission("ffautils.admin.use.kit")
         public void onUseKit(CommandSender p, String kit_name, @Optional String other_p)
         {
             Kit pk = km.getKits().get(kit_name.toUpperCase());
@@ -348,6 +388,7 @@ public class CommandFFAUtils extends BaseCommand
         }
 
         @Subcommand("spawn")
+        @CommandPermission("ffautils.admin.use.spawn")
         public void onUseSpawn(CommandSender p, String spawn_name, @Optional String other_p)
         {
             SpawnLocation spawn_to_teleport = sm.getSpawns().get(spawn_name.toUpperCase());
@@ -382,8 +423,15 @@ public class CommandFFAUtils extends BaseCommand
     public class CommandReload extends BaseCommand
     {
         @Default
+        @CommandPermission("ffautils.admin.reload.all")
         public void onDefault(CommandSender p)
         {
+            p.sendMessage(ChatColor.AQUA + "Reloading config, kits, spawns and selectors");
+            pl.reloadConfig();
+            dmm.reload();
+            rim.reload();
+            bcm.reload();
+            p.sendMessage(ChatColor.AQUA + "Config reloaded");
             for (Selector i : sem.getSelectors().values()) 
                 if (i.getEntity() != null) 
                 {   
@@ -394,7 +442,6 @@ public class CommandFFAUtils extends BaseCommand
                 @Override
                 public void run()
                 {
-                    p.sendMessage(ChatColor.AQUA + "Reloading config, kits, spawns and selectors");
                     int reloaded_kits = km.reloadKits();
                     int reloaded_spawns = sm.reloadSpawns();
                     int reloaded_selectors = sem.reloadSelectors();
@@ -423,6 +470,7 @@ public class CommandFFAUtils extends BaseCommand
         }
 
         @Subcommand("kits")
+        @CommandPermission("ffautils.admin.reload.kits")
         public void onReloadKits(CommandSender p)
         {
             new BukkitRunnable() {
@@ -437,6 +485,7 @@ public class CommandFFAUtils extends BaseCommand
         }
 
         @Subcommand("spawns")
+        @CommandPermission("ffautils.admin.reload.spawns")
         public void onReloadSpawns(CommandSender p)
         {
             new BukkitRunnable() {
@@ -451,6 +500,7 @@ public class CommandFFAUtils extends BaseCommand
         }
 
         @Subcommand("selectors")
+        @CommandPermission("ffautils.admin.reload.selectors")
         public void onReloadSelectors(CommandSender p)
         {
             for (Selector i : sem.getSelectors().values()) 
@@ -488,6 +538,17 @@ public class CommandFFAUtils extends BaseCommand
                 }
             }.runTaskAsynchronously(pl);
         }
+
+        @Subcommand("config")
+        @CommandPermission("ffautils.admin.reload.config")
+        public void onReloadConfig(CommandSender p)
+        {
+            pl.reloadConfig();
+            rim.reload();
+            dmm.reload();
+            bcm.reload();
+            p.sendMessage(ChatColor.AQUA + "Config reloaded");
+        }
     }
 
     @Subcommand("loadall")
@@ -499,6 +560,7 @@ public class CommandFFAUtils extends BaseCommand
 
         @Subcommand("loaded")
         @CommandCompletion("kit_name spawn_name")
+        @CommandPermission("ffautils.admin.loadall.loaded")
         public void onLoadAllLoadedPlayers(CommandSender s, String kit, String spawn)
         {
             SpawnLocation spawn_to_teleport = spawns.get(spawn.toUpperCase());
@@ -543,6 +605,7 @@ public class CommandFFAUtils extends BaseCommand
 
         @Subcommand("unloaded")
         @CommandCompletion("kit_name spawn_name")
+        @CommandPermission("ffautils.admin.loadall.unloaded")
         public void onLoadAllUnloadedPlayers(CommandSender s, String kit, String spawn)
         {
             SpawnLocation spawn_to_teleport = spawns.get(spawn.toUpperCase());
@@ -575,6 +638,7 @@ public class CommandFFAUtils extends BaseCommand
 
         @Subcommand("all")
         @CommandCompletion("kit_name spawn_name")
+        @CommandPermission("ffautils.admin.loadall.all")
         public void onLoadAllPlayers(CommandSender s, String kit, String spawn)
         {
             SpawnLocation spawn_to_teleport = spawns.get(spawn.toUpperCase());
@@ -621,6 +685,7 @@ public class CommandFFAUtils extends BaseCommand
     }
 
     @Subcommand("unloadall")
+    @CommandPermission("ffautils.admin.unloadall")
     public void onUnloadall(CommandSender s)
     {
         SpawnLocation main_spawn = sm.getSpawnOfType(SpawnLocation.SPAWN);
@@ -644,6 +709,7 @@ public class CommandFFAUtils extends BaseCommand
     }
 
     @Subcommand("load")
+    @CommandPermission("ffautils.admin.load")
     public void onLoadPlayer(CommandSender s, String p, String kit, String spawn)
     {
         Player pj = Bukkit.getPlayer(p);
@@ -660,6 +726,7 @@ public class CommandFFAUtils extends BaseCommand
     }
 
     @Subcommand("unload")
+    @CommandPermission("ffautils.admin.unload")
     public void onUnloadPlayer(CommandSender s, String p)
     {
         SpawnLocation main_spawn = sm.getSpawnOfType(SpawnLocation.SPAWN);
@@ -670,9 +737,12 @@ public class CommandFFAUtils extends BaseCommand
         }
 
         FFAPlayer ffaplayer = fph.getFFAPlayers().get(Bukkit.getPlayer(p).getUniqueId());
-        if (ffaplayer != null)  fph.movePlayerFromFFA(ffaplayer);
-         
-        s.sendMessage(ChatColor.AQUA + "Unloading " + p + " from ffa");
+        if (ffaplayer != null)  
+        {
+            fph.movePlayerFromFFA(ffaplayer);
+            s.sendMessage(ChatColor.AQUA + "Unloading " + p + " from ffa");
+        }
+        else s.sendMessage(ChatColor.RED + p + " is not loaded");
     }
 
     @Subcommand("selector")
@@ -681,7 +751,8 @@ public class CommandFFAUtils extends BaseCommand
     {
         @Subcommand("info")
         @CommandCompletion("id")
-        public void onSelectorInfo(CommandSender p, int id)
+        @CommandPermission("ffautils.admin.selector.info")
+        public void onSelectorInfo(CommandSender p, String id)
         {
             Selector s = sem.getSelectors().get(id);
             if (s == null)
@@ -691,7 +762,7 @@ public class CommandFFAUtils extends BaseCommand
             }
 
             p.sendMessage(ChatColor.AQUA + "Selector " + ChatColor.WHITE + String.valueOf(id) + ":");
-            p.sendMessage(ChatColor.GRAY + "Display name: " + ChatColor.WHITE + s.getDisplayName());
+            p.sendMessage(minimessage_deserializer.deserialize("<gray>Display name: </gray>" + s.getDisplayName()));
             p.sendMessage(ChatColor.GRAY + "Entity type: " + ChatColor.WHITE + s.getEntity().getType().toString());
             p.sendMessage(ChatColor.GRAY + "Kit: " + ChatColor.WHITE + s.getKit());
             p.sendMessage(ChatColor.GRAY + "Default spawn: " + ChatColor.WHITE + s.getDefaultSpawn());
@@ -703,7 +774,8 @@ public class CommandFFAUtils extends BaseCommand
         }
 
         @Subcommand("addspawn")
-        public void onAddSpawn(CommandSender p, int id, String spawn_name)
+        @CommandPermission("ffautils.admin.selector.addspawn")
+        public void onAddSpawn(CommandSender p, String id, String spawn_name)
         {
             SpawnLocation s = sm.getSpawns().get(spawn_name.toUpperCase());
             if (s == null)
@@ -736,7 +808,8 @@ public class CommandFFAUtils extends BaseCommand
 
         @Subcommand("removespawn")
         @CommandCompletion("id spawn_name")
-        public void onRemoveSpawn(CommandSender p, int id, String spawn_name)
+        @CommandPermission("ffautils.admin.selector.removespawn")
+        public void onRemoveSpawn(CommandSender p, String id, String spawn_name)
         {
             SpawnLocation s = sm.getSpawns().get(spawn_name.toUpperCase());
             if (s == null)
@@ -770,7 +843,8 @@ public class CommandFFAUtils extends BaseCommand
 
         @Subcommand("editlayout")
         @CommandCompletion("id")
-        public void onEditLayout(Player p, int id)
+        @CommandPermission("ffautils.admin.selector.editlayout")
+        public void onEditLayout(Player p, String id)
         {
             Selector sel = sem.getSelectors().get(id);
             
@@ -794,7 +868,7 @@ public class CommandFFAUtils extends BaseCommand
 
             for (String i : spawns.keySet())
             {
-                ItemStack spawn_placeholder = new ItemStack(Material.BLACK_CONCRETE);
+                ItemStack spawn_placeholder = new ItemStack(Material.PINK_CONCRETE);
                 ItemMeta im = spawn_placeholder.getItemMeta();
                 PersistentDataContainer pdc = im.getPersistentDataContainer();
                 pdc.set(key, PersistentDataType.STRING, i);
@@ -806,6 +880,208 @@ public class CommandFFAUtils extends BaseCommand
 
             p.openInventory(contents);
             p.sendMessage(ChatColor.AQUA + "This Layout will be saved when the inventory closes");
+        }
+
+        @Subcommand("tphere")
+        @CommandCompletion("id")
+        @CommandPermission("ffautils.admin.selector.tphere")
+        public void onSelectorTPHere(Player p, String id)
+        {
+            Selector sel = sem.getSelectors().get(id);
+
+            if (sel == null)
+            {
+                p.sendMessage("This selector does not exist");
+                return;
+            }
+
+            sel.setLocation(p.getLocation());
+            sel.getEntity().teleport(p.getLocation());
+
+            new BukkitRunnable() {
+                @Override
+                public void run()
+                {
+                    sem.reloadProperties(sel.getID());
+                    sem.reloadSelector(sel);
+                }
+            }.runTaskAsynchronously(pl);
+            p.sendMessage(ChatColor.AQUA + "Selector moved correctly");
+        }
+
+        @Subcommand("defaultspawn")
+        @CommandCompletion("id spawn")
+        @CommandPermission("ffautils.admin.selector.defaultspawn")
+        public void onSelectorSetDefaultSpawn(CommandSender sender, String id, String spawn)
+        {
+            Selector sel = sem.getSelectors().get(id);
+
+            if (sel == null)
+            {
+                sender.sendMessage(ChatColor.RED + "This selector does not exist");
+                return;
+            }
+
+            if (!sm.getSpawns().keySet().contains(spawn.toUpperCase()))
+            {
+                sender.sendMessage(ChatColor.RED + "This spawn does not exist");
+                return;
+            }
+
+            String previous_spawn = sel.getDefaultSpawn();
+            sel.setDefaultSpawn(spawn.toUpperCase());
+            new BukkitRunnable()
+            {
+                @Override
+                public void run()
+                {
+                    sem.reloadProperties(id);
+                    sem.reloadSelector(sel);
+                }
+            }.runTask(pl);
+            sender.sendMessage(ChatColor.AQUA + "Default spawn changed from " + previous_spawn + " to " + spawn);
+        }
+
+        @Subcommand("kit")
+        @CommandCompletion("id kit")
+        @CommandPermission("ffautils.admin.selector.kit")
+        public void onSelectorSetKit(CommandSender sender, String id, String kit)
+        {
+            Selector sel = sem.getSelectors().get(id);
+
+            if (sel == null)
+            {
+                sender.sendMessage(ChatColor.RED + "This selector does not exist");
+                return;
+            }
+            
+            if (!km.getKits().keySet().contains(kit.toUpperCase()))
+            {
+                sender.sendMessage(ChatColor.RED + "This kit does not exist");
+                return;
+            }
+
+            String previous_kit = sel.getKit();
+            sel.setKit(kit.toUpperCase());
+            new BukkitRunnable()
+            {
+                @Override
+                public void run()
+                {
+                    sem.reloadProperties(id);
+                    sem.reloadSelector(sel);
+                }
+            }.runTask(pl);
+            sender.sendMessage(ChatColor.AQUA + "Kit changed from " + previous_kit + " to " + kit);
+        }
+
+        @Subcommand("type")
+        @CommandCompletion("id zombie|husk|drowned|piglin|zombified_piglin|skeleton|wither_skeleton|stray|armor_stand")
+        @CommandPermission("ffautils.admin.selector.type")
+        public void onSelectorSetEntityType(CommandSender s, String id, String type)
+        {
+            Selector sel = sem.getSelectors().get(id);
+            if (sel == null)
+            {
+                s.sendMessage(ChatColor.RED + "This selector does not exist");
+                return;
+            }
+
+            EntityType etype = EntityType.fromName(type);
+
+            if (etype == null)
+            {
+                s.sendMessage(ChatColor.RED + "Entity type is not valid");
+                return;
+            }
+
+            sel.setType(etype);
+
+            new BukkitRunnable()
+            {
+                @Override
+                public void run()
+                {
+                    sem.reloadProperties(id);
+                    sem.reloadSelector(sel);
+                }
+            }.runTask(pl);
+            s.sendMessage(ChatColor.AQUA + "Entity type set to " + type);
+        }
+
+        @Subcommand("displayname")
+        @CommandCompletion("id minimessage")
+        @CommandPermission("ffautils.admin.selector.displayname")
+        public void onSelectorSetDisplayName(CommandSender s, String id, String minimsg)
+        {
+            Selector sel = sem.getSelectors().get(id);
+
+            if (sel == null)
+            {
+                s.sendMessage(ChatColor.RED + "This selector does not exist");
+                return;
+            }
+
+            sel.setDisplayName(minimsg);
+
+            new BukkitRunnable()
+            {
+                @Override
+                public void run()
+                {
+                    sem.reloadProperties(id);
+                    sem.reloadSelector(sel);
+                }
+            }.runTask(pl);
+            s.sendMessage(ChatColor.AQUA + "Display name changed successfully");
+        }
+
+        @Subcommand("containertitle")
+        @CommandCompletion("id minimessage")
+        @CommandPermission("ffautils.admin.selector.containertitle")
+        public void onSelectorSetContainerTitle(CommandSender s, String id, String minimsg)
+        {
+            Selector sel = sem.getSelectors().get(id);
+
+            if (sel == null)
+            {
+                s.sendMessage(ChatColor.RED + "This selector does not exist");
+                return;
+            }
+
+            sel.setContainerTitle(minimsg);
+
+            new BukkitRunnable()
+            {
+                @Override
+                public void run()
+                {
+                    sem.reloadProperties(id);
+                    sem.reloadSelector(sel);
+                }
+            }.runTask(pl);
+            s.sendMessage(ChatColor.AQUA + "Container title changed successfully");
+        }
+
+        @Subcommand("replicate")
+        @CommandCompletion("id")
+        @CommandPermission("ffautils.admin.selector.replicate")
+        public void onSelectorCopy(Player p, String id)
+        {
+            Selector se = sem.getSelectors().get(id);
+            if (se == null)
+            {
+                p.sendMessage(ChatColor.RED + "This selector does not exist");
+                return;
+            }
+
+            Selector ne = new Selector(se);
+            String newid = NanoIdUtils.randomNanoId(5);
+            ne.setID(newid);
+            ne.setLocation(p.getLocation());
+            sem.addSelector(newid, ne);
+            sem.reloadSelector(ne);
+            p.sendMessage(ChatColor.AQUA + "Selector replicated with ID " + newid);
         }
     }
 }

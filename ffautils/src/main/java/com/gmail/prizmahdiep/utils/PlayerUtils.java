@@ -1,11 +1,7 @@
 package com.gmail.prizmahdiep.utils;
 
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.gmail.prizmahdiep.FFAUtils;
@@ -17,7 +13,6 @@ import com.gmail.prizmahdiep.objects.FFAPlayer;
 import com.gmail.prizmahdiep.objects.Kit;
 import com.gmail.prizmahdiep.objects.SpawnLocation;
 
-import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatColor;
 
 public class PlayerUtils 
@@ -110,21 +105,5 @@ public class PlayerUtils
         boolean flag = false;
             if (flag = sm.isValidSpawn(s)) p.teleport(s.getLocation());
         return flag;
-    }
-
-    public static ItemStack getRespawnItem()
-    {
-        ItemStack respawn_item = new ItemStack(Material.getMaterial("PINK_DYE"));
-
-        NamespacedKey key = new NamespacedKey(futils, "respawn-item-type");
-
-        ItemMeta respawn_item_meta = respawn_item.getItemMeta();
-        
-        respawn_item_meta.getPersistentDataContainer().set(key, PersistentDataType.BOOLEAN, true);
-        respawn_item_meta.displayName(Component.text(ChatColor.LIGHT_PURPLE + "Respawn to last location"));
-
-        respawn_item.setItemMeta(respawn_item_meta);
-
-        return respawn_item;
     }
 }

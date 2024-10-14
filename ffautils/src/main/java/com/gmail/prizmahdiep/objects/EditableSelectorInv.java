@@ -8,16 +8,16 @@ import com.gmail.prizmahdiep.FFAUtils;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 public class EditableSelectorInv implements InventoryHolder
 {
-    Inventory inv;
-    int id;
-    MiniMessage minimessage_deserializer;
-    String title;
+    private Inventory inv;
+    private String id;
+    private MiniMessage minimessage_deserializer;
+    private String title;
 
-    public EditableSelectorInv(FFAUtils pl, int size, int id, String title, MiniMessage minimessage_deserializer)
+    public EditableSelectorInv(FFAUtils pl, int size, String id, String title, MiniMessage minimessage_deserializer)
     {
         this.title = title;
         this.minimessage_deserializer = minimessage_deserializer;
-        this.inv = pl.getServer().createInventory(this, size, minimessage_deserializer.deserialize(title));
+        this.inv = pl.getServer().createInventory(this, size, this.minimessage_deserializer.deserialize(title));
         this.id = id;
     }
 
@@ -27,8 +27,13 @@ public class EditableSelectorInv implements InventoryHolder
         return this.inv;
     }
 
-    public int getSelectorID()
+    public String getSelectorID()
     {
         return this.id;
+    }
+
+    public String getTitle()
+    {
+        return this.title;
     }
 }

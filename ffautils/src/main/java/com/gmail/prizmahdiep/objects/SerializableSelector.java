@@ -16,7 +16,7 @@ public class SerializableSelector
     private String container_name;
     private String entity_type;
     private String location;
-    private int id;
+    private String id;
 
     public SerializableSelector(Selector selector)
     {

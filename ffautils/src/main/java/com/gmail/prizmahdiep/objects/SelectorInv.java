@@ -12,12 +12,12 @@ public class SelectorInv implements InventoryHolder
 {
     private MiniMessage dse;
     private Inventory inv;
-    private int id;
+    private String id;
 
-    public SelectorInv(FFAUtils pl, int size, int id, String title, MiniMessage dse)
+    public SelectorInv(FFAUtils pl, int size, String id, String title, MiniMessage dse)
     {
         this.dse = dse;
-        this.inv = pl.getServer().createInventory(this, size, dse.deserialize(title));
+        this.inv = pl.getServer().createInventory(this, size, this.dse.deserialize(title));
         this.id = id;
     }
 
@@ -27,7 +27,7 @@ public class SelectorInv implements InventoryHolder
         return this.inv;
     }   
 
-    public int getSelectorID()
+    public String getSelectorID()
     {
         return this.id;
     }

@@ -1,5 +1,8 @@
-fast-respawn: true
-fast-respawn-item-type: PINK_DYE
-fast-respawn-item-name: "Damn"
-fast-respawn-item-lore: "That is pretty good"
-
+# Controls if a fast respawn item should be given to an unloaded player.
+fast-respawn-item: true
+# Sets the type of the fast respawn item
+fast-respawn-item-type: "PINK_DYE"
+# Sets the display name of the fast respawn item (it uses minimessage)
+fast-respawn-item-display-name: "Respawn rápido"
+# Sets the lore of the fast respawn item (it uses minimessage)
+fast-respawn-item-lore: "Interactúa para respawnear"

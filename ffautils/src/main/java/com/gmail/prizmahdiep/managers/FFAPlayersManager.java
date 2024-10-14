@@ -34,10 +34,9 @@ public class FFAPlayersManager
         return idle_ffa_players.containsKey(p);
     }
 
-    public boolean addPlayerToFFA(Player p, Kit k, SpawnLocation s)
+    public void addPlayerToFFA(Player p, Kit k, SpawnLocation s)
     {  
         UUID piud = p.getUniqueId();
-        if (isOnFFA(piud)) return false;
         removePlayerFromIdle(piud);
         
         FFAPlayer pf = idle_ffa_players.get(piud);
@@ -54,44 +53,33 @@ public class FFAPlayersManager
         ffa_players.put(p.getUniqueId(), pf);
 
         Bukkit.getServer().getPluginManager().callEvent(new FFAPlayerLoadEvent(pf));
-        return true;
     }
 
-    public boolean movePlayerFromFFA(FFAPlayer p)
+    public void movePlayerFromFFA(FFAPlayer p)
     {
         UUID piud = p.getUUID();
         idle_ffa_players.put(piud, p);
         removePlayerFromFFA(p);
-        return true;
     }
 
-    private boolean movePlayerFromIdle(FFAPlayer p)
+    private void movePlayerFromIdle(FFAPlayer p)
     {
         UUID piud = p.getUUID();
-        if (!isIdle(piud)) return false;
-
         ffa_players.put(piud, p);
         removePlayerFromIdle(piud);
         Bukkit.getServer().getPluginManager().callEvent(new FFAPlayerLoadEvent(p));
-        return true;
     }
 
-    public boolean removePlayerFromFFA(FFAPlayer p)
+    public void removePlayerFromFFA(FFAPlayer p)
     {
         UUID piud = p.getUUID();
-        if (isOnFFA(piud)) 
-        {
-            Bukkit.getServer().getPluginManager().callEvent(new FFAPlayerUnloadEvent(p));
-            ffa_players.remove(piud);
-        }
-        else return false;
-        return true;
+        Bukkit.getServer().getPluginManager().callEvent(new FFAPlayerUnloadEvent(p));
+        ffa_players.remove(piud);
     }
 
     public void removePlayerFromIdle(UUID p) 
     {
-        if (isIdle(p))
-            idle_ffa_players.remove(p);
+        idle_ffa_players.remove(p);
     }
 
     public void addPlayerToIdle(UUID p, FFAPlayer a)
