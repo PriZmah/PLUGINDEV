@@ -1,6 +1,7 @@
 com/gmail/prizmahdiep/database/EditedKitsDatabase.class
 com/gmail/prizmahdiep/utils/PlayerUtils$1.class
 com/gmail/prizmahdiep/commands/CommandFFAUtils$CommandLoadAll.class
+com/gmail/prizmahdiep/managers/BlockedCommandsManager.class
 com/gmail/prizmahdiep/managers/CombatTagManager$1.class
 com/gmail/prizmahdiep/commands/CommandFFAUtils$CommandSelector$5.class
 com/gmail/prizmahdiep/objects/SpawnLocation.class
@@ -38,6 +39,7 @@ com/gmail/prizmahdiep/commands/CommandFFAUtils$CommandSelector$4.class
 com/gmail/prizmahdiep/commands/CommandFFAUtils$CommandCreate.class
 com/gmail/prizmahdiep/objects/Kit.class
 com/gmail/prizmahdiep/commands/CommandFFAUtils$CommandCreate$2.class
+com/gmail/prizmahdiep/config/BlockedCommandsConfig.class
 com/gmail/prizmahdiep/commands/CommandFFAUtils$CommandReload$3.class
 com/gmail/prizmahdiep/utils/PlayerUtils$1$1.class
 com/gmail/prizmahdiep/events/KitEditorPlayerLoadEvent.class
